@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>نظام الحضور والمرتبات</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1c2430;--mu:#667085;--bd:#e2e6ec;--pr:#0f6cbd;--prt:#fff;--bad:#b42318;--ok:#067647}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#12161c;--card:#1b222b;--tx:#e8edf3;--mu:#98a2b3;--bd:#2d3744;--pr:#4aa3ff;--prt:#07121f;--bad:#f97066;--ok:#47cd89}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Tahoma,Arial,sans-serif;line-height:1.6}
+.w{max-width:900px;margin:0 auto;padding:14px}
+h1{font-size:19px;margin:6px 0 10px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1;padding:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:inherit;cursor:pointer}
+.tabs button.on{background:var(--pr);color:var(--prt);border-color:var(--pr)}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+label{display:block;font-size:12px;color:var(--mu);margin-bottom:3px}
+input,select{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+.b{padding:10px 16px;border:0;border-radius:8px;background:var(--pr);color:var(--prt);font:inherit;cursor:pointer;margin-top:10px}
+.b.s{background:transparent;color:var(--tx);border:1px solid var(--bd);padding:5px 10px;margin:0;font-size:12px}
+.b.big{font-size:18px;padding:16px 28px;margin:6px 4px}
+.sc{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:560px}
+th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}
+th{color:var(--mu);font-weight:normal}
+td input{min-width:70px;padding:5px}
+.neg{color:var(--bad)}.pos{color:var(--ok)}
+.note{font-size:12px;color:var(--mu);margin-top:8px}
+.err{color:var(--bad);font-size:13px;margin-top:8px}
+.hide{display:none}
+.ctr{text-align:center}
+a{color:var(--pr);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="w">
+
+<!-- ========= إعدادات: غيّرها قبل الرفع ========= -->
+<script>
+var FB_CONFIG = {
+  apiKey: "AIzaSyBsxM32hJTj3MW6iFAeegUnEt2zqJJksO8",
+  authDomain: "ac-attendance-f3667.firebaseapp.com",
+  projectId: "ac-attendance-f3667",
+  appId: "1:1013459859394:web:2214b2aa5c07008eeec85b"
+};
+var ADMIN_EMAIL = "amrw2076@gmail.com"; // إيميلك (لازم يطابق الموجود في firestore.rules)
+</script>
+<!-- ============================================ -->
+
+<h1>نظام الحضور والمرتبات</h1>
+
+<div id="auth" class="c hide">
+  <div class="g">
+    <div id="nmw" class="hide"><label>الاسم بالكامل</label><input id="nm"></div>
+    <div><label>الإيميل</label><input id="em" type="email" dir="ltr"></div>
+    <div><label>الباسورد (6 حروف على الأقل)</label><input id="pw" type="password" dir="ltr"></div>
+  </div>
+  <button class="b" id="go">دخول</button>
+  <div class="note"><a id="sw">معنديش حساب، عاوز أعمل حساب جديد</a></div>
+  <div class="err" id="ae"></div>
+</div>
+
+<div id="app" class="hide">
+  <div class="top"><b id="who"></b><button class="b s" id="out">خروج</button></div>
+
+  <!-- ===== شاشة الموظف ===== -->
+  <div id="emp" class="hide">
+    <div class="c ctr">
+      <div id="st" class="note"></div>
+      <button class="b big" id="ci">تسجيل حضور</button>
+      <button class="b big" id="co">تسجيل انصراف</button>
+    </div>
+    <div class="c sc"><table><thead><tr><th>التاريخ</th><th>حضور</th><th>انصراف</th></tr></thead><tbody id="myl"></tbody></table></div>
+  </div>
+
+  <!-- ===== شاشة الأدمن ===== -->
+  <div id="adm" class="hide">
+    <div class="tabs">
+      <button data-t="a1" class="on">الموظفين</button>
+      <button data-t="a2">الحضور</button>
+      <button data-t="a3">المرتبات</button>
+    </div>
+    <div id="a1" class="c sc">
+      <table><thead><tr><th>الاسم</th><th>الصافي</th><th>ساعات/يوم</th><th>بداية الشغل</th><th>خصومات ثابتة</th><th></th></tr></thead><tbody id="el"></tbody></table>
+      <div class="note">الموظف الجديد بيعمل حساب بنفسه من الرابط، وبعدين تحدد إنت الصافي والساعات هنا.</div>
+    </div>
+    <div id="a2" class="c sc hide">
+      <table><thead><tr><th>التاريخ</th><th>الموظف</th><th>حضور</th><th>انصراف</th><th>ساعات</th><th>إضافي</th><th>تأخير</th><th></th></tr></thead><tbody id="al"></tbody></table>
+    </div>
+    <div id="a3" class="hide">
+      <div class="c"><label>الشهر</label><input id="pm" type="month"></div>
+      <div class="c sc"><table><thead><tr><th>الموظف</th><th>الصافي</th><th>إضافي</th><th>خصم التأخير</th><th>خصومات ثابتة</th><th>المستحق</th></tr></thead><tbody id="pl"></tbody></table></div>
+      <div class="note">قيمة اليوم = الصافي ÷ 30. الساعة الإضافي بساعتين. التأخير: سماح 15 دقيقة، ثم ربع يوم حتى 30 دقيقة، ثم نص يوم حتى ساعة، ثم يوم كامل. (الغياب لسه مش محسوب.)</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function p2(n){return(n<10?"0":"")+n}
+function today(){var d=new Date();return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
+function nowT(){var d=new Date();return p2(d.getHours())+":"+p2(d.getMinutes())}
+function mins(t){var a=t.split(":");return(+a[0])*60+(+a[1])}
+function r2(n){return Math.round(n*100)/100}
+function lateFrac(m){return m<=15?0:m<=30?0.25:m<=60?0.5:1}
+
+if(FB_CONFIG.apiKey==="PUT_HERE"){document.body.innerHTML='<div class="w"><div class="c">لسه ماحطيتش إعدادات Firebase في أول الملف. اتبع خطوات الإعداد.</div></div>'}
+else{
+firebase.initializeApp(FB_CONFIG);
+var auth=firebase.auth(),db=firebase.firestore();
+var me=null,isAdmin=false,unsubs=[],U={},ST={},AT=[],signup=false;
+
+$("sw").onclick=function(){signup=!signup;$("nmw").classList.toggle("hide",!signup);$("go").textContent=signup?"إنشاء حساب":"دخول";$("sw").textContent=signup?"عندي حساب، عاوز أدخل":"معنديش حساب، عاوز أعمل حساب جديد";$("ae").textContent=""};
+$("go").onclick=function(){
+  var e=$("em").value.trim(),p=$("pw").value,n=$("nm").value.trim();$("ae").textContent="";
+  if(signup){
+    if(!n)return $("ae").textContent="اكتب اسمك";
+    auth.createUserWithEmailAndPassword(e,p).then(function(c){return db.collection("users").doc(c.user.uid).set({name:n,email:e})}).catch(showErr)
+  }else auth.signInWithEmailAndPassword(e,p).catch(showErr)
+};
+function showErr(x){var m={"auth/email-already-in-use":"الإيميل ده مستخدم قبل كده","auth/invalid-credential":"الإيميل أو الباسورد غلط","auth/weak-password":"الباسورد ضعيف (6 حروف على الأقل)","auth/invalid-email":"الإيميل مش مظبوط","auth/user-not-found":"مفيش حساب بالإيميل ده","auth/wrong-password":"الباسورد غلط"};$("ae").textContent=m[x.code]||("حصل خطأ: "+x.message)}
+$("out").onclick=function(){auth.signOut()};
+
+auth.onAuthStateChanged(function(u){
+  unsubs.forEach(function(f){f()});unsubs=[];me=u;
+  $("auth").classList.toggle("hide",!!u);$("app").classList.toggle("hide",!u);
+  if(!u)return;
+  isAdmin=(u.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();
+  $("adm").classList.toggle("hide",!isAdmin);$("emp").classList.toggle("hide",isAdmin);
+  $("who").textContent=u.email;
+  isAdmin?startAdmin():startEmp()
+});
+
+/* ===== الموظف ===== */
+function startEmp(){
+  var id=me.uid+"_"+today();
+  db.collection("users").doc(me.uid).get().then(function(d){if(d.exists)$("who").textContent=d.data().name});
+  unsubs.push(db.collection("att").where("uid","==",me.uid).onSnapshot(function(s){
+    var rows=s.docs.map(function(d){return d.data()}).sort(function(a,b){return a.d<b.d?1:-1});
+    $("myl").innerHTML=rows.map(function(a){return"<tr><td>"+esc(a.d)+"</td><td>"+esc(a.i)+"</td><td>"+esc(a.o||"-")+"</td></tr>"}).join("")||'<tr><td colspan="3">لسه مفيش تسجيلات</td></tr>';
+    var t=rows.filter(function(a){return a.d===today()})[0];
+    $("ci").disabled=!!t;$("co").disabled=!t||!!t.o;
+    $("st").textContent=!t?"لسه ماسجلتش حضور النهارده":!t.o?"حضورك مسجل الساعة "+t.i:"اتسجل حضورك "+t.i+" وانصرافك "+t.o
+  },function(e){$("st").textContent="تعذر تحميل البيانات: "+e.message}));
+  $("ci").onclick=function(){
+    var n=$("who").textContent;
+    db.collection("att").doc(id).set({uid:me.uid,name:n,d:today(),i:nowT(),o:""}).catch(function(e){alert("تعذر التسجيل: "+e.message)})};
+  $("co").onclick=function(){db.collection("att").doc(id).update({o:nowT()}).catch(function(e){alert("تعذر التسجيل: "+e.message)})}
+}
+
+/* ===== الأدمن ===== */
+function startAdmin(){
+  $("who").textContent="لوحة الأدمن";
+  unsubs.push(db.collection("users").onSnapshot(function(s){U={};s.forEach(function(d){U[d.id]=d.data()});drawE();drawA();drawP()}));
+  unsubs.push(db.collection("settings").onSnapshot(function(s){ST={};s.forEach(function(d){ST[d.id]=d.data()});drawE();drawA();drawP()}));
+  unsubs.push(db.collection("att").onSnapshot(function(s){AT=s.docs.map(function(d){var x=d.data();x.id=d.id;return x});drawA();drawP()}));
+}
+function stg(uid){var s=ST[uid]||{};return{net:+s.net||0,h:+s.hours||8,t:s.start||"09:00",d:+s.ded||0}}
+function calc(a,s){
+  var late=a.i?Math.max(0,mins(a.i)-mins(s.t)):0,w=0;
+  if(a.i&&a.o){w=(mins(a.o)-mins(a.i))/60;if(w<0)w+=24}
+  return{late:late,frac:lateFrac(late),w:w,ot:Math.max(0,w-s.h)}
+}
+function drawE(){
+  var ids=Object.keys(U);
+  $("el").innerHTML=ids.map(function(id){var s=stg(id);
+    return"<tr><td>"+esc(U[id].name)+'<div class="note">'+esc(U[id].email)+"</div></td>"+
+    '<td><input type="number" id="n_'+id+'" value="'+s.net+'"></td>'+
+    '<td><input type="number" step="0.5" id="h_'+id+'" value="'+s.h+'"></td>'+
+    '<td><input type="time" id="t_'+id+'" value="'+s.t+'"></td>'+
+    '<td><input type="number" id="d_'+id+'" value="'+s.d+'"></td>'+
+    '<td><button class="b s" data-sv="'+id+'">حفظ</button></td></tr>'}).join("")||'<tr><td colspan="6">لسه مفيش موظفين سجلوا</td></tr>'
+}
+function drawA(){
+  var rows=AT.slice().sort(function(a,b){return a.d<b.d?1:-1});
+  $("al").innerHTML=rows.map(function(a){var s=stg(a.uid),c=calc(a,s);
+    return"<tr><td>"+esc(a.d)+"</td><td>"+esc((U[a.uid]||{}).name||a.name)+"</td><td>"+esc(a.i)+"</td><td>"+esc(a.o||"-")+"</td><td>"+r2(c.w)+"</td><td>"+(c.ot?'<span class="pos">'+r2(c.ot)+"</span>":"0")+"</td><td>"+(c.late?'<span class="neg">'+c.late+" د</span>":"0")+'</td><td><button class="b s" data-ed="'+a.id+'">تعديل</button> <button class="b s" data-da="'+a.id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="8">لسه مفيش تسجيلات</td></tr>'
+}
+function drawP(){
+  var m=$("pm").value;
+  $("pl").innerHTML=Object.keys(U).map(function(id){
+    var s=stg(id),day=s.net/30,hr=day/s.h,ot=0,ld=0;
+    AT.forEach(function(a){if(a.uid!==id||a.d.slice(0,7)!==m)return;var c=calc(a,s);ot+=c.ot;ld+=c.frac*day});
+    var op=ot*2*hr,tot=s.net+op-ld-s.d;
+    return"<tr><td>"+esc(U[id].name)+"</td><td>"+s.net+"</td><td>"+r2(op)+"</td><td>"+(ld?'<span class="neg">'+r2(ld)+"</span>":"0")+"</td><td>"+s.d+"</td><td><b>"+r2(tot)+"</b></td></tr>"}).join("")||'<tr><td colspan="6">لسه مفيش موظفين</td></tr>'
+}
+document.addEventListener("click",function(ev){
+  var x=ev.target.dataset;if(!x)return;
+  if(x.sv){db.collection("settings").doc(x.sv).set({net:+$("n_"+x.sv).value||0,hours:+$("h_"+x.sv).value||8,start:$("t_"+x.sv).value||"09:00",ded:+$("d_"+x.sv).value||0}).then(function(){ev.target.textContent="اتحفظ ✓"})}
+  if(x.da&&confirm("حذف التسجيل؟"))db.collection("att").doc(x.da).delete();
+  if(x.ed){var a=AT.filter(function(r){return r.id===x.ed})[0];var i=prompt("وقت الحضور (مثال 09:15)",a.i);if(i===null)return;var o=prompt("وقت الانصراف (فاضي لو لسه)",a.o||"");if(o===null)return;
+    if(!/^\d{2}:\d{2}$/.test(i)||(o&&!/^\d{2}:\d{2}$/.test(o)))return alert("الصيغة لازم تبقى 09:15");db.collection("att").doc(x.ed).update({i:i,o:o})}
+});
+document.querySelectorAll(".tabs button").forEach(function(b){b.onclick=function(){
+  document.querySelectorAll(".tabs button").forEach(function(y){y.classList.remove("on")});b.classList.add("on");
+  ["a1","a2","a3"].forEach(function(t){$(t).classList.toggle("hide",t!==b.dataset.t)});drawP()}});
+$("pm").value=today().slice(0,7);$("pm").onchange=drawP;
+}
+</script>
+</body>
+</html>
