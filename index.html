@@ -84,16 +84,19 @@ var ADMIN_EMAIL = "amrw2076@gmail.com"; // إيميلك (لازم يطابق ا�
       <button data-t="a3">المرتبات</button>
     </div>
     <div id="a1" class="c sc">
-      <table><thead><tr><th>الاسم</th><th>الصافي</th><th>ساعات/يوم</th><th>بداية الشغل</th><th>خصومات ثابتة</th><th></th></tr></thead><tbody id="el"></tbody></table>
+      <table><thead><tr><th>الاسم</th><th>الصافي</th><th>ساعات/يوم</th><th>بداية الشغل</th><th>خصومات ثابتة</th><th>الإجازة الأسبوعية</th><th></th></tr></thead><tbody id="el"></tbody></table>
       <div class="note">الموظف الجديد بيعمل حساب بنفسه من الرابط، وبعدين تحدد إنت الصافي والساعات هنا.</div>
     </div>
     <div id="a2" class="c sc hide">
+      <div class="g" style="min-width:560px;margin-bottom:10px"><div><label>الموظف</label><select id="ms"></select></div><div><label>التاريخ</label><input id="md" type="date"></div><div><label>حضور</label><input id="mi" type="time"></div><div><label>انصراف</label><input id="mo" type="time"></div></div>
+      <button class="b" id="mb">إضافة تسجيل يدوي</button>
+      <div class="note" style="margin-bottom:12px">للغياب بإذن أو لو الموظف نسي يسجل: ضيف تسجيل في نفس اليوم وهيتحسب حضور.</div>
       <table><thead><tr><th>التاريخ</th><th>الموظف</th><th>حضور</th><th>انصراف</th><th>ساعات</th><th>إضافي</th><th>تأخير</th><th></th></tr></thead><tbody id="al"></tbody></table>
     </div>
     <div id="a3" class="hide">
-      <div class="c"><label>الشهر</label><input id="pm" type="month"></div>
-      <div class="c sc"><table><thead><tr><th>الموظف</th><th>الصافي</th><th>إضافي</th><th>خصم التأخير</th><th>خصومات ثابتة</th><th>المستحق</th></tr></thead><tbody id="pl"></tbody></table></div>
-      <div class="note">قيمة اليوم = الصافي ÷ 30. الساعة الإضافي بساعتين. التأخير: سماح 15 دقيقة، ثم ربع يوم حتى 30 دقيقة، ثم نص يوم حتى ساعة، ثم يوم كامل. (الغياب لسه مش محسوب.)</div>
+      <div class="c"><label>الشهر</label><input id="pm" type="month"><button class="b" id="ex">تصدير المرتبات (Excel)</button></div>
+      <div class="c sc"><table><thead><tr><th>الموظف</th><th>الصافي</th><th>إضافي</th><th>خصم التأخير</th><th>أيام الغياب</th><th>خصم الغياب</th><th>خصومات ثابتة</th><th>المستحق</th></tr></thead><tbody id="pl"></tbody></table></div>
+      <div class="note">قيمة اليوم = الصافي ÷ 30. الساعة الإضافي بساعتين. التأخير: سماح 15 دقيقة، ثم ربع يوم حتى 30 دقيقة، ثم نص يوم حتى ساعة، ثم يوم كامل. الغياب: كل يوم شغل (غير الإجازة الأسبوعية) من غير تسجيل بيتخصم يوم كامل، من يوم تسجيل الموظف لحد امبارح.</div>
     </div>
   </div>
 </div>
@@ -123,7 +126,7 @@ $("go").onclick=function(){
   var e=$("em").value.trim(),p=$("pw").value,n=$("nm").value.trim();$("ae").textContent="";
   if(signup){
     if(!n)return $("ae").textContent="اكتب اسمك";
-    auth.createUserWithEmailAndPassword(e,p).then(function(c){return db.collection("users").doc(c.user.uid).set({name:n,email:e})}).catch(showErr)
+    auth.createUserWithEmailAndPassword(e,p).then(function(c){return db.collection("users").doc(c.user.uid).set({name:n,email:e,created:today()})}).catch(showErr)
   }else auth.signInWithEmailAndPassword(e,p).catch(showErr)
 };
 function showErr(x){var m={"auth/email-already-in-use":"الإيميل ده مستخدم قبل كده","auth/invalid-credential":"الإيميل أو الباسورد غلط","auth/weak-password":"الباسورد ضعيف (6 حروف على الأقل)","auth/invalid-email":"الإيميل مش مظبوط","auth/user-not-found":"مفيش حساب بالإيميل ده","auth/wrong-password":"الباسورد غلط"};$("ae").textContent=m[x.code]||("حصل خطأ: "+x.message)}
@@ -163,38 +166,52 @@ function startAdmin(){
   unsubs.push(db.collection("settings").onSnapshot(function(s){ST={};s.forEach(function(d){ST[d.id]=d.data()});drawE();drawA();drawP()}));
   unsubs.push(db.collection("att").onSnapshot(function(s){AT=s.docs.map(function(d){var x=d.data();x.id=d.id;return x});drawA();drawP()}));
 }
-function stg(uid){var s=ST[uid]||{};return{net:+s.net||0,h:+s.hours||8,t:s.start||"09:00",d:+s.ded||0}}
+function stg(uid){var s=ST[uid]||{};return{net:+s.net||0,h:+s.hours||8,t:s.start||"09:00",d:+s.ded||0,off:s.off==null?5:+s.off}}
 function calc(a,s){
   var late=a.i?Math.max(0,mins(a.i)-mins(s.t)):0,w=0;
   if(a.i&&a.o){w=(mins(a.o)-mins(a.i))/60;if(w<0)w+=24}
   return{late:late,frac:lateFrac(late),w:w,ot:Math.max(0,w-s.h)}
 }
+function ids(){return Object.keys(U).filter(function(i){return(U[i].email||"").toLowerCase()!==ADMIN_EMAIL.toLowerCase()})}
+var DN=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+function ymd(d){return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
 function drawE(){
-  var ids=Object.keys(U);
-  $("el").innerHTML=ids.map(function(id){var s=stg(id);
+  $("el").innerHTML=ids().map(function(id){var s=stg(id);
     return"<tr><td>"+esc(U[id].name)+'<div class="note">'+esc(U[id].email)+"</div></td>"+
     '<td><input type="number" id="n_'+id+'" value="'+s.net+'"></td>'+
     '<td><input type="number" step="0.5" id="h_'+id+'" value="'+s.h+'"></td>'+
     '<td><input type="time" id="t_'+id+'" value="'+s.t+'"></td>'+
     '<td><input type="number" id="d_'+id+'" value="'+s.d+'"></td>'+
-    '<td><button class="b s" data-sv="'+id+'">حفظ</button></td></tr>'}).join("")||'<tr><td colspan="6">لسه مفيش موظفين سجلوا</td></tr>'
+    '<td><select id="o_'+id+'">'+DN.map(function(n,i){return'<option value="'+i+'"'+(i===s.off?" selected":"")+">"+n+"</option>"}).join("")+"</select></td>"+
+    '<td><button class="b s" data-sv="'+id+'">حفظ</button></td></tr>'}).join("")||'<tr><td colspan="7">لسه مفيش موظفين سجلوا</td></tr>';
+  var sel=$("ms");if(sel.options.length!==ids().length)sel.innerHTML=ids().map(function(id){return'<option value="'+id+'">'+esc(U[id].name)+"</option>"}).join("")
 }
 function drawA(){
   var rows=AT.slice().sort(function(a,b){return a.d<b.d?1:-1});
   $("al").innerHTML=rows.map(function(a){var s=stg(a.uid),c=calc(a,s);
     return"<tr><td>"+esc(a.d)+"</td><td>"+esc((U[a.uid]||{}).name||a.name)+"</td><td>"+esc(a.i)+"</td><td>"+esc(a.o||"-")+"</td><td>"+r2(c.w)+"</td><td>"+(c.ot?'<span class="pos">'+r2(c.ot)+"</span>":"0")+"</td><td>"+(c.late?'<span class="neg">'+c.late+" د</span>":"0")+'</td><td><button class="b s" data-ed="'+a.id+'">تعديل</button> <button class="b s" data-da="'+a.id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="8">لسه مفيش تسجيلات</td></tr>'
 }
+var PR=[];
+function absDays(id,s,m){
+  var u=U[id]||{},y=new Date();y.setDate(y.getDate()-1);var ys=ymd(y),have={},n=0;
+  AT.forEach(function(a){if(a.uid===id)have[a.d]=1});
+  var d=new Date(m+"-01T00:00:00");
+  while(true){var k=ymd(d);if(k.slice(0,7)!==m||k>ys)break;
+    if(k>=(u.created||"")&&d.getDay()!==s.off&&!have[k])n++;d.setDate(d.getDate()+1)}
+  return n
+}
 function drawP(){
-  var m=$("pm").value;
-  $("pl").innerHTML=Object.keys(U).map(function(id){
+  var m=$("pm").value;PR=[];
+  $("pl").innerHTML=ids().map(function(id){
     var s=stg(id),day=s.net/30,hr=day/s.h,ot=0,ld=0;
     AT.forEach(function(a){if(a.uid!==id||a.d.slice(0,7)!==m)return;var c=calc(a,s);ot+=c.ot;ld+=c.frac*day});
-    var op=ot*2*hr,tot=s.net+op-ld-s.d;
-    return"<tr><td>"+esc(U[id].name)+"</td><td>"+s.net+"</td><td>"+r2(op)+"</td><td>"+(ld?'<span class="neg">'+r2(ld)+"</span>":"0")+"</td><td>"+s.d+"</td><td><b>"+r2(tot)+"</b></td></tr>"}).join("")||'<tr><td colspan="6">لسه مفيش موظفين</td></tr>'
+    var ab=absDays(id,s,m),op=ot*2*hr,ad=ab*day,tot=s.net+op-ld-ad-s.d;
+    PR.push([U[id].name,s.net,r2(op),r2(ld),ab,r2(ad),s.d,r2(tot)]);
+    return"<tr><td>"+esc(U[id].name)+"</td><td>"+s.net+"</td><td>"+r2(op)+"</td><td>"+(ld?'<span class="neg">'+r2(ld)+"</span>":"0")+"</td><td>"+(ab?'<span class="neg">'+ab+"</span>":"0")+"</td><td>"+(ad?'<span class="neg">'+r2(ad)+"</span>":"0")+"</td><td>"+s.d+"</td><td><b>"+r2(tot)+"</b></td></tr>"}).join("")||'<tr><td colspan="8">لسه مفيش موظفين</td></tr>'
 }
 document.addEventListener("click",function(ev){
   var x=ev.target.dataset;if(!x)return;
-  if(x.sv){db.collection("settings").doc(x.sv).set({net:+$("n_"+x.sv).value||0,hours:+$("h_"+x.sv).value||8,start:$("t_"+x.sv).value||"09:00",ded:+$("d_"+x.sv).value||0}).then(function(){ev.target.textContent="اتحفظ ✓"})}
+  if(x.sv){db.collection("settings").doc(x.sv).set({net:+$("n_"+x.sv).value||0,hours:+$("h_"+x.sv).value||8,start:$("t_"+x.sv).value||"09:00",ded:+$("d_"+x.sv).value||0,off:+$("o_"+x.sv).value}).then(function(){ev.target.textContent="اتحفظ ✓"})}
   if(x.da&&confirm("حذف التسجيل؟"))db.collection("att").doc(x.da).delete();
   if(x.ed){var a=AT.filter(function(r){return r.id===x.ed})[0];var i=prompt("وقت الحضور (مثال 09:15)",a.i);if(i===null)return;var o=prompt("وقت الانصراف (فاضي لو لسه)",a.o||"");if(o===null)return;
     if(!/^\d{2}:\d{2}$/.test(i)||(o&&!/^\d{2}:\d{2}$/.test(o)))return alert("الصيغة لازم تبقى 09:15");db.collection("att").doc(x.ed).update({i:i,o:o})}
@@ -202,6 +219,14 @@ document.addEventListener("click",function(ev){
 document.querySelectorAll(".tabs button").forEach(function(b){b.onclick=function(){
   document.querySelectorAll(".tabs button").forEach(function(y){y.classList.remove("on")});b.classList.add("on");
   ["a1","a2","a3"].forEach(function(t){$(t).classList.toggle("hide",t!==b.dataset.t)});drawP()}});
+$("mb").onclick=function(){var u=$("ms").value,d=$("md").value,i=$("mi").value,o=$("mo").value;
+  if(!u||!d||!i)return alert("اختار الموظف والتاريخ ووقت الحضور");
+  db.collection("att").doc(u+"_"+d).set({uid:u,name:U[u].name,d:d,i:i,o:o}).catch(function(e){alert("تعذر الحفظ: "+e.message)})};
+$("ex").onclick=function(){
+  var h=["الموظف","الصافي","الإضافي","خصم التأخير","أيام الغياب","خصم الغياب","خصومات ثابتة","المستحق"];
+  var csv="\ufeff"+[h].concat(PR).map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(",")}).join("\r\n");
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="salaries-"+$("pm").value+".csv";a.click()};
+$("md").value=today();
 $("pm").value=today().slice(0,7);$("pm").onchange=drawP;
 }
 </script>
