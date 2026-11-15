@@ -78,7 +78,7 @@ var ADMIN_EMAIL = "amrw2076@gmail.com"; // إيميلك (لازم يطابق ا�
       <button class="b big" id="ci">تسجيل حضور</button>
       <button class="b big" id="co">تسجيل انصراف</button>
     </div>
-    <div class="c"><label>الشهر</label><input id="mm" type="month"><button class="b" id="mp">طباعة شيت المرتب</button><div class="note" id="mn"></div></div>
+    <div class="c"><label>الشهر</label><input id="mm" type="month"><div class="note" id="mn"></div></div>
     <div class="c sc"><b>مرتبك خلال الشهر</b><table style="min-width:0"><tbody id="mt"></tbody></table><div class="note">الأرقام تقديرية وبتتحدث لحظياً، والغياب بيتحسب لحد امبارح.</div></div>
     <div class="c sc"><b>الحضور والتأخير</b><table><thead><tr><th>التاريخ</th><th>حضور</th><th>انصراف</th><th>تأخير</th><th>إضافي (س)</th></tr></thead><tbody id="myl"></tbody></table></div>
     <div class="c sc"><b>السلف والمكافآت</b><table style="min-width:0"><thead><tr><th>النوع</th><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th></tr></thead><tbody id="myf"></tbody></table></div>
@@ -94,9 +94,14 @@ var ADMIN_EMAIL = "amrw2076@gmail.com"; // إيميلك (لازم يطابق ا�
       <button data-t="a3">المرتبات</button>
       <button data-t="a4">سلف ومكافآت</button>
       <button data-t="a5">الطلبات</button>
+      <button data-t="a6">الأدمن</button>
     </div>
     <div id="a4" class="hide"><div class="c"><div class="g"><div><label>الموظف</label><select id="fs"></select></div><div><label>النوع</label><select id="ft"><option value="advances">سلفة</option><option value="bonuses">مكافأة</option></select></div><div><label>المبلغ</label><input id="fa" type="number" min="0"></div><div><label>التاريخ</label><input id="fd" type="date"></div><div><label>ملاحظة</label><input id="fn"></div></div><button class="b" id="fb">إضافة</button><div class="note">السلفة بتتخصم من مرتب الشهر اللي في تاريخها، والمكافأة بتتضاف له.</div></div><div class="c sc"><table><thead><tr><th>النوع</th><th>الموظف</th><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th><th></th></tr></thead><tbody id="fl"></tbody></table></div></div>
     <div id="a5" class="c sc hide"><table><thead><tr><th>الموظف</th><th>النوع</th><th>التفاصيل</th><th>ملاحظة</th><th>الحالة</th><th></th></tr></thead><tbody id="rl"></tbody></table><div class="note">قبول الإجازة بيحسبها يوم بإذن (من غير خصم)، وقبول السلفة بيسجلها بتاريخ النهارده.</div></div>
+    <div id="a6" class="hide"><div class="c"><div class="g"><div><label>إيميل الأدمن الجديد</label><input id="ne" type="email" dir="ltr"></div></div>
+      <div style="margin-top:10px"><label><input type="checkbox" id="np_pay" style="width:auto"> المرتبات والطباعة والتصدير</label><label><input type="checkbox" id="np_edit" style="width:auto"> تعديل بيانات الموظفين والمرتبات</label><label><input type="checkbox" id="np_att" style="width:auto"> الحضور والتعديل عليه</label><label><input type="checkbox" id="np_fin" style="width:auto"> السلف والمكافآت والطلبات</label></div>
+      <button class="b" id="aa">إضافة / تحديث</button><div class="note">لازم صاحب الإيميل يكون عمل حساب في الموقع الأول، وبعد إضافته يخرج ويدخل تاني. ولتغيير صلاحيات أدمن موجود، أضفه تاني بنفس الإيميل بالصلاحيات الجديدة.</div></div>
+      <div class="c sc"><table style="min-width:0"><thead><tr><th>الإيميل</th><th>الصلاحيات</th><th></th></tr></thead><tbody id="adl"></tbody></table></div></div>
     <div id="a1" class="c sc">
       <table><thead><tr><th>الاسم</th><th>الصافي</th><th>ساعات/يوم</th><th>بداية الشغل</th><th>خصومات ثابتة</th><th>الإجازة الأسبوعية</th><th></th></tr></thead><tbody id="el"></tbody></table>
       <div class="note">الموظف الجديد بيعمل حساب بنفسه من الرابط، وبعدين تحدد إنت الصافي والساعات هنا.</div>
@@ -134,7 +139,7 @@ if(FB_CONFIG.apiKey==="PUT_HERE"){document.body.innerHTML='<div class="w"><div c
 else{
 firebase.initializeApp(FB_CONFIG);
 var auth=firebase.auth(),db=firebase.firestore();
-var me=null,isAdmin=false,unsubs=[],U={},ST={},AT=[],ADV=[],BON=[],REQ=[],signup=false;
+var me=null,isAdmin=false,unsubs=[],U={},ST={},AT=[],ADV=[],BON=[],REQ=[],ADMS=[],PERM=null,signup=false;
 
 $("sw").onclick=function(){signup=!signup;$("nmw").classList.toggle("hide",!signup);$("go").textContent=signup?"إنشاء حساب":"دخول";$("sw").textContent=signup?"عندي حساب، عاوز أدخل":"معنديش حساب، عاوز أعمل حساب جديد";$("ae").textContent=""};
 $("go").onclick=function(){
@@ -148,13 +153,22 @@ function showErr(x){var m={"auth/email-already-in-use":"الإيميل ده مس
 $("out").onclick=function(){auth.signOut()};
 
 auth.onAuthStateChanged(function(u){
-  unsubs.forEach(function(f){f()});unsubs=[];me=u;U={};ST={};AT=[];ADV=[];BON=[];REQ=[];
+  unsubs.forEach(function(f){f()});unsubs=[];me=u;U={};ST={};AT=[];ADV=[];BON=[];REQ=[];ADMS=[];PERM=null;
   $("auth").classList.toggle("hide",!!u);$("app").classList.toggle("hide",!u);
   if(!u)return;
-  isAdmin=(u.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();
-  $("adm").classList.toggle("hide",!isAdmin);$("emp").classList.toggle("hide",isAdmin);
-  $("who").textContent=u.email;
-  isAdmin?startAdmin():startEmp()
+  var own=(u.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();
+  function go(p){
+    if(me!==u)return;PERM=p;isAdmin=!!p;
+    $("adm").classList.toggle("hide",!isAdmin);$("emp").classList.toggle("hide",isAdmin);
+    $("who").textContent=u.email;
+    if(isAdmin){
+      var need={a1:"edit",a2:"att",a3:"pay",a4:"fin",a5:"fin",a6:"owner"},first=null;
+      document.querySelectorAll(".tabs button").forEach(function(b){var ok=!!p[need[b.dataset.t]];b.style.display=ok?"":"none";if(ok&&!first)first=b});
+      startAdmin();if(first)first.click()
+    }else startEmp()
+  }
+  if(own)go({owner:1,pay:1,edit:1,att:1,fin:1});
+  else db.collection("admins").doc((u.email||"").toLowerCase()).get().then(function(d){go(d.exists?d.data():null)}).catch(function(){go(null)})
 });
 
 /* ===== الموظف ===== */
@@ -170,7 +184,6 @@ function startEmp(){
   on(db.collection("requests").where("uid","==",id),function(s){REQ=mk(s)});
   $("ci").onclick=function(){db.collection("att").doc(tid).set({uid:id,name:(U[id]||{}).name||me.email,d:today(),i:nowT(),o:""}).catch(function(e){alert("تعذر التسجيل: "+e.message)})};
   $("co").onclick=function(){db.collection("att").doc(tid).update({o:nowT()}).catch(function(e){alert("تعذر التسجيل: "+e.message)})};
-  $("mp").onclick=function(){printSlips([id],$("mm").value)};
   $("rq").onclick=function(){var t=$("rt").value,a=+$("ra").value,d1=$("rd1").value,d2=$("rd2").value||d1;
     if(t==="leave"&&!d1)return alert("اختار تاريخ الإجازة");
     if(t==="advance"&&!(a>0))return alert("اكتب مبلغ السلفة");
@@ -194,22 +207,29 @@ function drawMe(){
 
 /* ===== الأدمن ===== */
 function startAdmin(){
-  $("who").textContent="لوحة الأدمن";
+  $("who").textContent=PERM.owner?"لوحة الأدمن":"أدمن: "+me.email;
   function on(c,f){unsubs.push(db.collection(c).onSnapshot(function(s){f(s);drawAll()},function(e){console.error(c,e.message)}))}
   function mk(s){return s.docs.map(function(d){var x=d.data();x.id=d.id;return x})}
   on("users",function(s){U={};s.forEach(function(d){U[d.id]=d.data()})});
-  on("settings",function(s){ST={};s.forEach(function(d){ST[d.id]=d.data()})});
-  on("att",function(s){AT=mk(s)});on("advances",function(s){ADV=mk(s)});
-  on("bonuses",function(s){BON=mk(s)});on("requests",function(s){REQ=mk(s)});
+  if(PERM.pay||PERM.edit)on("settings",function(s){ST={};s.forEach(function(d){ST[d.id]=d.data()})});
+  on("att",function(s){AT=mk(s)});
+  if(PERM.fin||PERM.pay){on("advances",function(s){ADV=mk(s)});on("bonuses",function(s){BON=mk(s)})}
+  if(PERM.fin)on("requests",function(s){REQ=mk(s)});
+  if(PERM.owner)on("admins",function(s){ADMS=mk(s)});
 }
-function drawAll(){drawE();drawA();drawP();drawF();drawReq()}
+var PL={pay:"المرتبات",edit:"تعديل الموظفين",att:"الحضور",fin:"السلف والطلبات"};
+function drawAdm(){
+  if(!PERM||!PERM.owner)return;
+  $("adl").innerHTML=ADMS.map(function(a){return'<tr><td dir="ltr">'+esc(a.id)+"</td><td>"+Object.keys(PL).filter(function(k){return a[k]}).map(function(k){return PL[k]}).join("، ")+'</td><td><button class="b s" data-dl="'+esc(a.id)+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="3">مفيش أدمن إضافيين</td></tr>'
+}
+function drawAll(){drawE();drawA();drawP();drawF();drawReq();drawAdm()}
 function stg(uid){var s=ST[uid]||{};return{net:+s.net||0,h:+s.hours||8,t:s.start||"09:00",d:+s.ded||0,off:s.off==null?5:+s.off}}
 function calc(a,s){if(a.leave)return{late:0,frac:0,w:0,ot:0};
   var late=a.i?Math.max(0,mins(a.i)-mins(s.t)):0,w=0;
   if(a.i&&a.o){w=(mins(a.o)-mins(a.i))/60;if(w<0)w+=24}
   return{late:late,frac:lateFrac(late),w:w,ot:Math.max(0,w-s.h)}
 }
-function ids(){return Object.keys(U).filter(function(i){return(U[i].email||"").toLowerCase()!==ADMIN_EMAIL.toLowerCase()})}
+function ids(){var ex=ADMS.map(function(a){return a.id});return Object.keys(U).filter(function(i){var e=(U[i].email||"").toLowerCase();return e!==ADMIN_EMAIL.toLowerCase()&&ex.indexOf(e)<0})}
 var DN=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
 function ymd(d){return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
 function drawE(){
@@ -279,6 +299,7 @@ function printSlips(L,m){$("ps").innerHTML=L.map(function(i){return slip(i,m)}).
 document.addEventListener("click",function(ev){
   var x=ev.target.dataset;if(!x)return;
   if(x.pr)printSlips([x.pr],$("pm").value);
+  if(x.dl&&confirm("حذف الأدمن ده؟"))db.collection("admins").doc(x.dl).delete();
   if(x.ap)approve(x.ap);
   if(x.rj)db.collection("requests").doc(x.rj).update({status:"rejected"});
   if(x.df&&confirm("حذف؟")){var q=x.df.split("/");db.collection(q[0]).doc(q[1]).delete()}
@@ -289,7 +310,7 @@ document.addEventListener("click",function(ev){
 });
 document.querySelectorAll(".tabs button").forEach(function(b){b.onclick=function(){
   document.querySelectorAll(".tabs button").forEach(function(y){y.classList.remove("on")});b.classList.add("on");
-  ["a1","a2","a3","a4","a5"].forEach(function(t){$(t).classList.toggle("hide",t!==b.dataset.t)});drawP()}});
+  ["a1","a2","a3","a4","a5","a6"].forEach(function(t){$(t).classList.toggle("hide",t!==b.dataset.t)});drawP()}});
 $("mb").onclick=function(){var u=$("ms").value,d=$("md").value,i=$("mi").value,o=$("mo").value;
   if(!u||!d||!i)return alert("اختار الموظف والتاريخ ووقت الحضور");
   db.collection("att").doc(u+"_"+d).set({uid:u,name:U[u].name,d:d,i:i,o:o}).catch(function(e){alert("تعذر الحفظ: "+e.message)})};
@@ -297,6 +318,11 @@ $("ex").onclick=function(){
   var h=["الموظف","الصافي","الإضافي","مكافآت","خصم التأخير","أيام الغياب","خصم الغياب","خصومات ثابتة","سلف","المستحق"];
   var csv="\ufeff"+[h].concat(PR).map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(",")}).join("\r\n");
   var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="salaries-"+$("pm").value+".csv";a.click()};
+$("aa").onclick=function(){var e=$("ne").value.trim().toLowerCase();
+  if(!/^\S+@\S+\.\S+$/.test(e))return alert("اكتب إيميل صحيح");
+  var d={added:today()};["pay","edit","att","fin"].forEach(function(k){d[k]=$("np_"+k).checked});
+  if(!d.pay&&!d.edit&&!d.att&&!d.fin)return alert("اختار صلاحية واحدة على الأقل");
+  db.collection("admins").doc(e).set(d).then(function(){$("ne").value=""}).catch(function(x){alert("تعذر الحفظ: "+x.message)})};
 $("pa").onclick=function(){printSlips(ids(),$("pm").value)};
 $("fb").onclick=function(){var u=$("fs").value,a=+$("fa").value,d=$("fd").value;
   if(!u||!(a>0)||!d)return alert("اختار الموظف واكتب المبلغ والتاريخ");
