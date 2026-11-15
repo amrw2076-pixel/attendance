@@ -118,7 +118,7 @@ var ADMIN_EMAIL = "amrw2076@gmail.com"; // إيميلك (لازم يطابق ا�
     <div class="c sc"><b>مرتبك خلال الشهر</b><table style="min-width:0"><tbody id="mt"></tbody></table><div class="note">الأرقام تقديرية وبتتحدث لحظياً، والغياب بيتحسب لحد امبارح.</div></div>
     <div class="c sc"><b>الحضور والتأخير</b><table><thead><tr><th>التاريخ</th><th>حضور</th><th>انصراف</th><th>تأخير</th><th>إضافي (س)</th></tr></thead><tbody id="myl"></tbody></table></div>
     <div class="c sc"><b>السلف والمكافآت</b><table style="min-width:0"><thead><tr><th>النوع</th><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th></tr></thead><tbody id="myf"></tbody></table></div>
-    <div class="c"><b>طلب جديد</b><div class="g" style="margin-top:8px"><div><label>النوع</label><select id="rt"><option value="leave">إجازة</option><option value="advance">سلفة</option></select></div><div><label>من تاريخ (للإجازة)</label><input id="rd1" type="date"></div><div><label>إلى تاريخ (للإجازة)</label><input id="rd2" type="date"></div><div><label>المبلغ (للسلفة)</label><input id="ra" type="number" min="0"></div><div><label>ملاحظة</label><input id="rn"></div></div><button class="b" id="rq">إرسال الطلب</button></div>
+    <div class="c"><b>طلب جديد</b><div class="g" style="margin-top:8px"><div><label>النوع</label><select id="rt"><option value="leave">إجازة</option><option value="advance">سلفة</option></select></div><div><label>من تاريخ (للإجازة)</label><input id="rd1" type="date"></div><div><label>إلى تاريخ (للإجازة)</label><input id="rd2" type="date"></div><div><label>المبلغ (للسلفة)</label><input id="ra" type="number" min="0"></div><div><label>ملاحظة</label><input id="rn"></div></div><div class="note" id="lvn"></div><button class="b" id="rq">إرسال الطلب</button></div>
     <div class="c sc"><b>طلباتي</b><table style="min-width:0"><thead><tr><th>النوع</th><th>التفاصيل</th><th>الحالة</th></tr></thead><tbody id="myr"></tbody></table></div>
   </div>
 
@@ -135,14 +135,14 @@ var ADMIN_EMAIL = "amrw2076@gmail.com"; // إيميلك (لازم يطابق ا�
       <button data-t="a8">الشغل المنجز</button>
       <button data-t="a9">مراجعة شاملة</button>
     </div>
-    <div id="a4" class="hide"><div class="c"><div class="g"><div><label>الموظف</label><select id="fs"></select></div><div><label>النوع</label><select id="ft"><option value="advances">سلفة</option><option value="bonuses">مكافأة</option></select></div><div><label>المبلغ</label><input id="fa" type="number" min="0"></div><div><label>التاريخ</label><input id="fd" type="date"></div><div><label>ملاحظة</label><input id="fn"></div></div><button class="b" id="fb">إضافة</button><div class="note">السلفة بتتخصم من مرتب الشهر اللي في تاريخها، والمكافأة بتتضاف له.</div></div><div class="c sc"><table><thead><tr><th>النوع</th><th>الموظف</th><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th><th></th></tr></thead><tbody id="fl"></tbody></table></div></div>
+    <div id="a4" class="hide"><div class="c"><div class="g"><div><label>الموظف</label><select id="fs"></select></div><div><label>النوع</label><select id="ft"><option value="advances">سلفة</option><option value="bonuses">مكافأة</option><option value="penalties">جزاء</option></select></div><div><label>المبلغ</label><input id="fa" type="number" min="0"></div><div><label>التاريخ</label><input id="fd" type="date"></div><div><label>ملاحظة</label><input id="fn"></div></div><button class="b" id="fb">إضافة</button><div class="note">السلفة بتتخصم من مرتب الشهر اللي في تاريخها، والمكافأة بتتضاف له.</div></div><div class="c sc"><table><thead><tr><th>النوع</th><th>الموظف</th><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th><th></th></tr></thead><tbody id="fl"></tbody></table></div></div>
     <div id="a5" class="c sc hide"><table><thead><tr><th>الموظف</th><th>النوع</th><th>التفاصيل</th><th>ملاحظة</th><th>الحالة</th><th></th></tr></thead><tbody id="rl"></tbody></table><div class="note">قبول الإجازة بيحسبها يوم بإذن (من غير خصم)، وقبول السلفة بيسجلها بتاريخ النهارده.</div></div>
     <div id="a6" class="hide"><div class="c"><div class="g"><div><label>إيميل الأدمن الجديد</label><input id="ne" type="email" dir="ltr"></div></div>
       <div style="margin-top:10px"><label><input type="checkbox" id="np_pay" style="width:auto"> المرتبات والطباعة والتصدير</label><label><input type="checkbox" id="np_edit" style="width:auto"> تعديل بيانات الموظفين والمرتبات</label><label><input type="checkbox" id="np_att" style="width:auto"> الحضور والتعديل عليه</label><label><input type="checkbox" id="np_fin" style="width:auto"> السلف والمكافآت والطلبات</label></div>
       <button class="b" id="aa">إضافة / تحديث</button><div class="note">لازم صاحب الإيميل يكون عمل حساب في الموقع الأول، وبعد إضافته يخرج ويدخل تاني. ولتغيير صلاحيات أدمن موجود، أضفه تاني بنفس الإيميل بالصلاحيات الجديدة.</div></div>
       <div class="c sc"><table style="min-width:0"><thead><tr><th>الإيميل</th><th>الصلاحيات</th><th></th></tr></thead><tbody id="adl"></tbody></table></div></div>
     <div id="a1"><div id="ip" class="c hide"></div><div class="c sc">
-      <table><thead><tr><th>الاسم</th><th>الصافي</th><th>ساعات/يوم</th><th>بداية الشغل</th><th>خصومات ثابتة</th><th>الإجازة الأسبوعية</th><th>الوظيفة</th><th>الفرع</th><th></th></tr></thead><tbody id="el"></tbody></table>
+      <table><thead><tr><th>الاسم</th><th>الصافي</th><th>ساعات/يوم</th><th>بداية الشغل</th><th>خصومات ثابتة</th><th>الإجازة الأسبوعية</th><th>الوظيفة</th><th>الفرع</th><th>رصيد الإجازة (يوم/سنة)</th><th></th></tr></thead><tbody id="el"></tbody></table>
       <div class="note">الموظف الجديد بيعمل حساب بنفسه من الرابط، وبعدين تحدد إنت الصافي والساعات والوظيفة والفرع هنا، وزر «حوافز» لقيم الحوافز.</div>
     </div></div>
     <div id="a2" class="c sc hide">
@@ -150,7 +150,7 @@ var ADMIN_EMAIL = "amrw2076@gmail.com"; // إيميلك (لازم يطابق ا�
       <label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="mx" style="width:auto"> بإذن / حالة استثنائية (من غير أي خصم)</label>
       <button class="b" id="mb">إضافة / حفظ تسجيل</button>
       <div class="note" style="margin-bottom:12px">تقدر تضيف أو تعدل حضور وانصراف أي موظف (لو عنده مشكلة أو نسي يسجل)، وعلّم «بإذن» لو مش عاوز يتخصم منه حاجة. كل ده بيتسجل في «مراجعة شاملة».</div>
-      <table><thead><tr><th>التاريخ</th><th>الموظف</th><th>حضور</th><th>انصراف</th><th>ساعات</th><th>إضافي</th><th>تأخير</th><th>الموقع</th><th></th></tr></thead><tbody id="al"></tbody></table>
+      <div class="g" style="margin:10px 0;min-width:560px"><div><label>بحث بالموظف</label><input id="fq"></div><div><label>من تاريخ</label><input id="ff" type="date"></div><div><label>إلى تاريخ</label><input id="ft2" type="date"></div><div><label>الحالة</label><select id="fz"><option value="">الكل</option><option value="late">متأخر</option><option value="ex">بإذن</option><option value="open">لسه ماانصرفش</option></select></div></div><table><thead><tr><th>التاريخ</th><th>الموظف</th><th>حضور</th><th>انصراف</th><th>ساعات</th><th>إضافي</th><th>تأخير</th><th>الموقع</th><th></th></tr></thead><tbody id="al"></tbody></table>
     </div>
     <div id="a9" class="c sc hide"><b>🔎 مراجعة شاملة</b><div class="note">كل إجراء أدمن بيتسجل هنا: مين عمله، ومتى، وعلى مين.</div><table><thead><tr><th>الوقت</th><th>الأدمن</th><th>الإجراء</th><th>الموظف</th><th>التفاصيل</th></tr></thead><tbody id="aul"></tbody></table></div>
     <div id="a7" class="hide"><div class="c"><div class="g"><div><label>اسم الفرع</label><input id="bn"></div><div><label>الإحداثيات (خط العرض, خط الطول)</label><input id="bc" dir="ltr" placeholder="30.0444, 31.2357"></div><div><label>النطاق (متر)</label><input id="brd" type="number" min="20" value="100"></div></div><button class="b" id="bg">استخدم موقعي الحالي</button> <button class="b" id="ba">إضافة فرع</button><div class="note">الأفضل تقف جوه الفرع وتدوس «استخدم موقعي الحالي». أو انسخ الإحداثيات من جوجل ماب (كليك يمين على المكان). بعد كدة حدد فرع كل موظف من تاب الموظفين.</div></div><div class="c sc"><table style="min-width:0"><thead><tr><th>الفرع</th><th>الموقع</th><th>النطاق</th><th></th></tr></thead><tbody id="bl"></tbody></table></div></div>
@@ -198,7 +198,7 @@ $("out").onclick=function(){auth.signOut()};
 (function(){var l=document.createElement("link");l.rel="icon";l.href=$("lg").src;document.head.appendChild(l)})();
 
 auth.onAuthStateChanged(function(u){
-  unsubs.forEach(function(f){f()});unsubs=[];me=u;U={};ST={};AT=[];ADV=[];BON=[];REQ=[];ADMS=[];PERM=null;BR={};WK=[];wgRole=null;AN=[];RD={};RA=[];HOL={};AN1={};AN2={};CL={};PS={};
+  unsubs.forEach(function(f){f()});unsubs=[];me=u;U={};ST={};AT=[];ADV=[];BON=[];REQ=[];ADMS=[];PERM=null;BR={};WK=[];wgRole=null;AN=[];RD={};RA=[];HOL={};AN1={};AN2={};CL={};PS={};PEN=[];
   $("auth").classList.toggle("hide",!!u);$("app").classList.toggle("hide",!u);
   if(!u)return;
   var own=(u.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();
@@ -273,7 +273,7 @@ function startEmp(){
   on(db.collection("settings").doc(id),function(d){ST[id]=d.exists?d.data():{}});
   on(db.collection("att").where("uid","==",id),function(s){AT=mk(s)});
   on(db.collection("advances").where("uid","==",id),function(s){ADV=mk(s)});
-  on(db.collection("bonuses").where("uid","==",id),function(s){BON=mk(s)});
+  on(db.collection("bonuses").where("uid","==",id),function(s){BON=mk(s)});on(db.collection("penalties").where("uid","==",id),function(s){PEN=mk(s)});
   on(db.collection("requests").where("uid","==",id),function(s){REQ=mk(s)});
   on(db.collection("branches"),function(s){BR={};s.forEach(function(d){BR[d.id]=d.data()})});
   on(db.collection("work").where("uid","==",id),function(s){WK=mk(s)});
@@ -301,7 +301,7 @@ function startEmp(){
     b.commit().then(function(){document.querySelectorAll("#wg input").forEach(function(i){i.value=""});$("wn").value="";$("wc").value="";alert("اتسجل وبانتظار اعتماد الإدارة، وبعدها بيتحسب على مرتبك")}).catch(function(e){alert("تعذر التسجيل: "+e.message)})};
   $("rq").onclick=function(){var t=$("rt").value,a=+$("ra").value,d1=$("rd1").value,d2=$("rd2").value||d1;
     if(t==="leave"&&!d1)return alert("اختار تاريخ الإجازة");
-    if(t==="advance"&&!(a>0))return alert("اكتب مبلغ السلفة");
+    if(t==="advance"&&!(a>0))return alert("اكتب مبلغ السلفة");if(t==="advance"&&stg(id).net&&a>stg(id).net/2)return alert("الحد الأقصى للسلفة نص المرتب ("+stg(id).net/2+" ج)");
     db.collection("requests").add({uid:id,name:(U[id]||{}).name||me.email,type:t,d1:t==="leave"?d1:"",d2:t==="leave"?d2:"",amount:t==="advance"?a:0,note:$("rn").value.trim(),status:"pending",created:today()}).then(function(){$("ra").value="";$("rn").value="";alert("اتبعت الطلب للإدارة")}).catch(function(e){alert("تعذر الإرسال: "+e.message)})};
   $("mm").onchange=drawMe;$("mm").value=today().slice(0,7);empExtra(id);
 }
@@ -311,12 +311,12 @@ function drawMe(){
   $("ci").disabled=!!t;$("co").disabled=!t||!!t.o||!!t.leave;
   $("st").textContent=!t?"لسه ماسجلتش حضور النهارده":t.leave?"النهارده إجازة":!t.o?"حضورك مسجل الساعة "+t.i:"اتسجل حضورك "+t.i+" وانصرافك "+t.o;
   $("mn").textContent=CL[m]?"🔒 الشهر مقفول والأرقام نهائية":P.s.net?"":"الإدارة لسه ماحددتش مرتبك";
-  var R=[["الصافي الأساسي",P.s.net,""],["الإضافي ("+r2(P.otH)+" ساعة)",P.op,"+"],["حوافز ("+P.cnt+")",P.inc,"+"],["مكافآت",P.bon,"+"],["خصم التأخير والانصراف المبكر ("+P.lm+" دقيقة)",P.ld,"-"],["خصم الغياب ("+P.ab+" يوم)",P.ad,"-"],["خصومات ثابتة",P.s.d,"-"],["سلف",P.adv,"-"]];
+  var R=[["الصافي الأساسي",P.s.net,""],["الإضافي ("+r2(P.otH)+" ساعة)",P.op,"+"],["حوافز ("+P.cnt+")",P.inc,"+"],["مكافآت",P.bon,"+"],["خصم التأخير والانصراف المبكر ("+P.lm+" دقيقة)",P.ld,"-"],["خصم الغياب ("+P.ab+" يوم)",P.ad,"-"],["خصومات ثابتة",P.s.d,"-"],["سلف وجزاءات",P.adv,"-"]];
   $("mt").innerHTML=R.map(function(r){return"<tr><td>"+r[0]+'</td><td class="'+(r[1]&&r[2]=="-"?"neg":r[1]&&r[2]=="+"?"pos":"")+'">'+(r[1]&&r[2]?r[2]+" ":"")+r2(r[1])+"</td></tr>"}).join("")+"<tr><td><b>المستحق المتوقع</b></td><td><b>"+r2(P.tot)+"</b></td></tr>";
   var rows=AT.filter(function(a){return a.d.slice(0,7)===m}).sort(function(a,b){return a.d<b.d?1:-1});
   $("myl").innerHTML=rows.map(function(a){var c=calc(a,P.s);return"<tr><td>"+esc(a.d)+"</td><td>"+esc(a.leave?"إجازة":a.i)+"</td><td>"+esc(a.o||"-")+"</td><td>"+(c.late?c.late+" د":"0")+(c.early>30&&!a.ex?" | مبكر "+c.early+" د":"")+"</td><td>"+(c.ot?r2(c.ot):"0")+"</td></tr>"}).join("")||'<tr><td colspan="5">مفيش تسجيلات</td></tr>';
   drawMeX(id,m,P);if(typeof drawEN==="function")drawEN();
-  var F=ADV.map(function(x){return{l:"سلفة",x:x}}).concat(BON.map(function(x){return{l:"مكافأة",x:x}})).filter(function(o){return o.x.d.slice(0,7)===m}).sort(function(a,b){return a.x.d<b.x.d?1:-1});
+  var F=ADV.map(function(x){return{l:"سلفة",x:x}}).concat(BON.map(function(x){return{l:"مكافأة",x:x}})).concat(PEN.map(function(x){return{l:"جزاء",x:x}})).filter(function(o){return o.x.d.slice(0,7)===m}).sort(function(a,b){return a.x.d<b.x.d?1:-1});
   $("myf").innerHTML=F.map(function(o){return"<tr><td>"+o.l+"</td><td>"+esc(o.x.d)+"</td><td>"+o.x.amount+"</td><td>"+esc(o.x.note)+"</td></tr>"}).join("")||'<tr><td colspan="4">مفيش سلف أو مكافآت</td></tr>';
   $("myr").innerHTML=REQ.slice().sort(function(a,b){return a.created<b.created?1:-1}).map(function(r){return"<tr><td>"+(r.type==="leave"?"إجازة":"سلفة")+"</td><td>"+(r.type==="leave"?esc(r.d1)+" ← "+esc(r.d2):r.amount)+"</td><td>"+SL[r.status]+"</td></tr>"}).join("")||'<tr><td colspan="3">مفيش طلبات</td></tr>'
 }
@@ -332,7 +332,7 @@ function startAdmin(){
   on("att",function(s){AT=mk(s)});
   on("branches",function(s){BR={};s.forEach(function(d){BR[d.id]=d.data()})});
   if(PERM.att||PERM.pay)on("work",function(s){WK=mk(s)});
-  if(PERM.fin||PERM.pay){on("advances",function(s){ADV=mk(s)});on("bonuses",function(s){BON=mk(s)})}
+  if(PERM.fin||PERM.pay){on("advances",function(s){ADV=mk(s)});on("bonuses",function(s){BON=mk(s)});on("penalties",function(s){PEN=mk(s)})}
   if(PERM.fin)on("requests",function(s){REQ=mk(s)});
   if(PERM.owner)on("admins",function(s){ADMS=mk(s)});
   if(PERM.full)unsubs.push(db.collection("audit").orderBy("at","desc").limit(300).onSnapshot(function(s){AU=s.docs.map(function(d){return d.data({serverTimestamps:"estimate"})});drawAu()},function(e){console.error("audit",e.message)}));
@@ -345,7 +345,7 @@ function drawAdm(){
 function AUD(act,uid,det){db.collection("audit").add({by:me.email,at:firebase.firestore.FieldValue.serverTimestamp(),act:act,who:uid?((U[uid]||{}).name||""):"",det:det||""}).catch(function(){})}
 function drawAu(){$("aul").innerHTML=AU.map(function(a){var t=a.at&&a.at.toDate?a.at.toDate().toLocaleString("ar-EG",{timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"short"}):"";return"<tr><td>"+esc(t)+'</td><td dir="ltr">'+esc(a.by)+"</td><td><b>"+esc(a.act)+"</b></td><td>"+esc(a.who)+"</td><td>"+esc(a.det)+"</td></tr>"}).join("")||'<tr><td colspan="5">مفيش سجل لسه</td></tr>'}
 function drawAll(){drawE();drawA();drawP();drawF();drawReq();drawAdm();drawBr();drawW();extraAdm()}
-function stg(uid){var s=ST[uid]||{};return{net:+s.net||0,h:+s.hours||8,t:s.start||"09:00",d:+s.ded||0,off:s.off==null?5:+s.off,role:s.role||"other",branch:s.branch||"",instv:s.instv||{},maintv:+s.maintv||0,sp:s.sp||{}}}
+function stg(uid){var s=ST[uid]||{};return{net:+s.net||0,h:+s.hours||8,t:s.start||"09:00",d:+s.ded||0,off:s.off==null?5:+s.off,role:s.role||"other",branch:s.branch||"",instv:s.instv||{},maintv:+s.maintv||0,sp:s.sp||{},lb:s.lb==null?21:+s.lb}}
 function earlyFrac(e){return e<=30?0:e<=60?0.25:e<=90?0.5:1}
 function calc(a,s){
   if(a.leave)return{late:0,early:0,frac:0,w:0,ot:0};
@@ -366,11 +366,11 @@ function drawE(){
     '<td><input type="time" id="t_'+id+'" value="'+s.t+'"></td>'+
     '<td><input type="number" id="d_'+id+'" value="'+s.d+'"></td>'+
     '<td><select id="o_'+id+'">'+DN.map(function(n,i){return'<option value="'+i+'"'+(i===s.off?" selected":"")+">"+n+"</option>"}).join("")+"</select></td>"+
-    '<td><select id="ro_'+id+'">'+roleOpts(s.role)+"</select></td>"+'<td><select id="br_'+id+'">'+brOpts(s.branch)+"</select></td>"+'<td><button class="b s" data-sv="'+id+'">حفظ</button> <button class="b s" data-ic="'+id+'">حوافز</button></td></tr>'}).join("")||'<tr><td colspan="9">لسه مفيش موظفين سجلوا</td></tr>';
+    '<td><select id="ro_'+id+'">'+roleOpts(s.role)+"</select></td>"+'<td><select id="br_'+id+'">'+brOpts(s.branch)+"</select></td>"+'<td><input type="number" min="0" id="lb_'+id+'" value="'+s.lb+'"></td>'+'<td><button class="b s" data-sv="'+id+'">حفظ</button> <button class="b s" data-ic="'+id+'">حوافز</button></td></tr>'}).join("")||'<tr><td colspan="10">لسه مفيش موظفين سجلوا</td></tr>';
   ["ms","fs"].forEach(function(i){var sel=$(i);if(sel.options.length!==ids().length)sel.innerHTML=ids().map(function(id){return'<option value="'+id+'">'+esc(U[id].name)+"</option>"}).join("")})
 }
 function drawA(){
-  var rows=AT.slice().sort(function(a,b){return a.d<b.d?1:-1});
+  var rows=AT.slice().sort(function(a,b){return a.d<b.d?1:-1}).filter(attF);
   $("al").innerHTML=rows.map(function(a){var s=stg(a.uid),c=calc(a,s);
     return"<tr><td>"+esc(a.d)+"</td><td>"+esc((U[a.uid]||{}).name||a.name)+"</td><td>"+esc(a.leave?"إجازة":a.i)+"</td><td>"+esc(a.o||"-")+(a.ex?' <span class="tg">بإذن</span>':"")+"</td><td>"+r2(c.w)+"</td><td>"+(c.ot?'<span class="pos">'+r2(c.ot)+"</span>":"0")+"</td><td>"+(c.late?'<span class="neg">'+c.late+" د</span>":"0")+(c.early>30&&!a.ex?' <span class="neg">مبكر '+c.early+" د</span>":"")+'</td><td>'+locTxt(a)+'</td><td>'+(!a.o&&!a.leave?'<button class="b s" data-xo="'+a.id+'">انصراف الآن</button> ':"")+'<button class="b s" data-ed="'+a.id+'">تعديل</button> <button class="b s" data-da="'+a.id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="9">لسه مفيش تسجيلات</td></tr>'
 }
@@ -387,7 +387,7 @@ function sumL(L,id,m){return L.filter(function(x){return x.uid===id&&x.d.slice(0
 function payCalc(id,m){var z=PS[id+"_"+m];if(z)return{s:Object.assign(stg(id),{net:z.net,d:z.ded}),otH:z.otH,op:z.op,lm:z.lm,ld:z.ld,ab:z.ab,ad:z.ad,adv:z.adv,bon:z.bon,inc:z.inc,cnt:z.cnt,tot:z.tot};
   var s=stg(id),day=s.net/30,hr=day/s.h,ot=0,ld=0,lm=0;
   AT.forEach(function(a){if(a.uid!==id||a.d.slice(0,7)!==m)return;var c=calc(a,s);ot+=c.ot;ld+=c.frac*day;lm+=c.frac?c.late+c.early:0});
-  var ab=absDays(id,s,m),adv=sumL(ADV,id,m),bon=sumL(BON,id,m),op=ot*2*hr,ad=ab*day,inc=0,cnt=0;WK.forEach(function(w){if(w.uid===id&&w.d.slice(0,7)===m&&(w.st||"approved")==="approved"){inc+=incOf(w,s);cnt+=(+w.qty||0)}});
+  var ab=absDays(id,s,m),adv=sumL(ADV,id,m)+sumL(PEN,id,m),bon=sumL(BON,id,m),op=ot*2*hr,ad=ab*day,inc=0,cnt=0;WK.forEach(function(w){if(w.uid===id&&w.d.slice(0,7)===m&&(w.st||"approved")==="approved"){inc+=incOf(w,s);cnt+=(+w.qty||0)}});
   return{s:s,otH:ot,op:op,lm:lm,ld:ld,ab:ab,ad:ad,adv:adv,bon:bon,inc:inc,cnt:cnt,tot:s.net+op+inc+bon-ld-ad-s.d-adv}
 }
 function drawP(){
@@ -397,7 +397,7 @@ function drawP(){
     return"<tr><td>"+esc(U[id].name)+"</td><td>"+P.s.net+"</td><td>"+r2(P.op)+"</td><td>"+r2(P.inc)+"</td><td>"+r2(P.bon)+"</td><td>"+n(P.ld)+"</td><td>"+P.ab+"</td><td>"+n(P.ad)+"</td><td>"+P.s.d+"</td><td>"+n(P.adv)+"</td><td><b>"+r2(P.tot)+'</b></td><td><button class="b s" data-pr="'+id+'">طباعة</button></td></tr>'}).join("")||'<tr><td colspan="12">لسه مفيش موظفين</td></tr>'
 }
 function drawF(){
-  var L=ADV.map(function(x){return Object.assign({t:"advances",l:"سلفة"},x)}).concat(BON.map(function(x){return Object.assign({t:"bonuses",l:"مكافأة"},x)})).sort(function(a,b){return a.d<b.d?1:-1});
+  var L=ADV.map(function(x){return Object.assign({t:"advances",l:"سلفة"},x)}).concat(BON.map(function(x){return Object.assign({t:"bonuses",l:"مكافأة"},x)})).concat(PEN.map(function(x){return Object.assign({t:"penalties",l:"جزاء"},x)})).sort(function(a,b){return a.d<b.d?1:-1});
   $("fl").innerHTML=L.map(function(x){return"<tr><td>"+x.l+"</td><td>"+esc(x.name)+"</td><td>"+esc(x.d)+"</td><td>"+x.amount+"</td><td>"+esc(x.note)+'</td><td><button class="b s" data-df="'+x.t+"/"+x.id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="6">لسه مفيش</td></tr>'
 }
 function drawReq(){
@@ -418,7 +418,7 @@ function approve(rid){
 }
 function slip(id,m){
   var P=payCalc(id,m),u=U[id]||{};
-  var R=[["الصافي الأساسي",P.s.net],["الإضافي ("+r2(P.otH)+" ساعة × 2)",P.op],["حوافز ("+P.cnt+" جهاز/صيانة)",P.inc],["مكافآت",P.bon],["خصم التأخير والانصراف المبكر ("+P.lm+" دقيقة)",-P.ld],["الغياب ("+P.ab+" يوم)",-P.ad],["خصومات ثابتة",-P.s.d],["سلف",-P.adv]];
+  var R=[["الصافي الأساسي",P.s.net],["الإضافي ("+r2(P.otH)+" ساعة × 2)",P.op],["حوافز ("+P.cnt+" جهاز/صيانة)",P.inc],["مكافآت",P.bon],["خصم التأخير والانصراف المبكر ("+P.lm+" دقيقة)",-P.ld],["الغياب ("+P.ab+" يوم)",-P.ad],["خصومات ثابتة",-P.s.d],["سلف وجزاءات",-P.adv]];
   return'<div class="slip"><div style="display:flex;align-items:center;gap:12px;border-bottom:2px solid #163b69;padding-bottom:10px;margin-bottom:10px"><img src="'+$("lg").src+'" style="width:64px;height:64px;object-fit:contain"><div><b style="font-size:20px;color:#163b69">توكيلات محمد فكري</b><br><span>لتجارة وتوزيع التكييف</span></div></div><h2>شيت مرتب شهر '+esc(m)+"</h2><p>الموظف: <b>"+esc(u.name)+"</b></p><table>"+R.map(function(r){return"<tr><td>"+r[0]+"</td><td>"+r2(r[1])+"</td></tr>"}).join("")+"<tr><td><b>صافي المستحق</b></td><td><b>"+r2(P.tot)+"</b></td></tr></table><p>توقيع الموظف: ____________ &nbsp;&nbsp;&nbsp; توقيع المحاسب: ____________</p></div>"
 }
 function printSlips(L,m){$("ps").innerHTML=L.map(function(i){return slip(i,m)}).join("");document.body.classList.add("pr");window.print();document.body.classList.remove("pr")}
@@ -426,10 +426,10 @@ document.addEventListener("click",function(ev){
   var x=ev.target.dataset;if(!x)return;
   if(x.pr)printSlips([x.pr],$("pm").value);
   if(x.dl&&confirm("حذف الأدمن ده؟"))db.collection("admins").doc(x.dl).delete().then(function(){AUD("حذف أدمن",null,x.dl)});
-  if(x.ap){approve(x.ap);var rq=REQ.filter(function(q){return q.id===x.ap})[0]||{};notify(rq.uid,"✅ تم قبول طلبك",rq.type==="leave"?"إجازة "+rq.d1+" ← "+rq.d2:"سلفة "+rq.amount);AUD("قبول طلب",rq.uid,rq.type==="leave"?"إجازة "+rq.d1+" ← "+rq.d2:"سلفة "+rq.amount)}
+  if(x.ap&&lvOk(x.ap)){approve(x.ap);var rq=REQ.filter(function(q){return q.id===x.ap})[0]||{};notify(rq.uid,"✅ تم قبول طلبك",rq.type==="leave"?"إجازة "+rq.d1+" ← "+rq.d2:"سلفة "+rq.amount);AUD("قبول طلب",rq.uid,rq.type==="leave"?"إجازة "+rq.d1+" ← "+rq.d2:"سلفة "+rq.amount)}
   if(x.rj){db.collection("requests").doc(x.rj).update({status:"rejected"});var rr=REQ.filter(function(q){return q.id===x.rj})[0]||{};notify(rr.uid,"✖️ تم رفض طلبك",rr.type==="leave"?"إجازة "+rr.d1+" ← "+rr.d2:"سلفة "+rr.amount);AUD("رفض طلب",rr.uid,rr.type==="leave"?"إجازة "+rr.d1+" ← "+rr.d2:"سلفة "+rr.amount)}
-  if(x.df&&confirm("حذف؟")){var q=x.df.split("/"),z=ADV.concat(BON).filter(function(y){return y.id===q[1]})[0]||{};db.collection(q[0]).doc(q[1]).delete().then(function(){AUD("حذف "+(q[0]==="advances"?"سلفة":"مكافأة"),z.uid,z.amount+" | "+z.d)})}
-  if(x.sv){db.collection("settings").doc(x.sv).set({net:+$("n_"+x.sv).value||0,hours:+$("h_"+x.sv).value||8,start:$("t_"+x.sv).value||"09:00",ded:+$("d_"+x.sv).value||0,off:+$("o_"+x.sv).value,role:$("ro_"+x.sv).value,branch:$("br_"+x.sv).value},{merge:true}).then(function(){ev.target.textContent="اتحفظ ✓";AUD("تعديل بيانات موظف",x.sv,"الصافي "+$("n_"+x.sv).value+" | ساعات "+$("h_"+x.sv).value+" | بداية "+$("t_"+x.sv).value+" | خصومات "+$("d_"+x.sv).value)})}
+  if(x.df&&confirm("حذف؟")){var q=x.df.split("/"),z=ADV.concat(BON,PEN).filter(function(y){return y.id===q[1]})[0]||{};db.collection(q[0]).doc(q[1]).delete().then(function(){AUD("حذف "+PN[q[0]],z.uid,z.amount+" | "+z.d)})}
+  if(x.sv){db.collection("settings").doc(x.sv).set({net:+$("n_"+x.sv).value||0,hours:+$("h_"+x.sv).value||8,start:$("t_"+x.sv).value||"09:00",ded:+$("d_"+x.sv).value||0,off:+$("o_"+x.sv).value,role:$("ro_"+x.sv).value,branch:$("br_"+x.sv).value,lb:$("lb_"+x.sv).value===""?21:+$("lb_"+x.sv).value},{merge:true}).then(function(){ev.target.textContent="اتحفظ ✓";AUD("تعديل بيانات موظف",x.sv,"الصافي "+$("n_"+x.sv).value+" | ساعات "+$("h_"+x.sv).value+" | بداية "+$("t_"+x.sv).value+" | خصومات "+$("d_"+x.sv).value)})}
   if(x.ic)openInc(x.ic);
   if(x.svi)saveInc(x.svi,ev.target);
   if(x.ipx)$("ip").classList.add("hide");
@@ -458,7 +458,7 @@ $("aa").onclick=function(){var e=$("ne").value.trim().toLowerCase();
 $("pa").onclick=function(){printSlips(ids(),$("pm").value)};
 $("fb").onclick=function(){var u=$("fs").value,a=+$("fa").value,d=$("fd").value;
   if(!u||!(a>0)||!d)return alert("اختار الموظف واكتب المبلغ والتاريخ");
-  db.collection($("ft").value).add({uid:u,name:U[u].name,amount:a,d:d,note:$("fn").value.trim()}).then(function(){notify(u,$("ft").value==="advances"?"💸 سلفة اتسجلت عليك":"🎁 مكافأة جديدة",$("fa").value+" ج | "+$("fd").value);AUD("إضافة "+($("ft").value==="advances"?"سلفة":"مكافأة"),u,a+" | "+d+" | "+$("fn").value.trim());$("fa").value="";$("fn").value=""}).catch(function(e){alert("تعذر الحفظ: "+e.message)})};
+  db.collection($("ft").value).add({uid:u,name:U[u].name,amount:a,d:d,note:$("fn").value.trim()}).then(function(){notify(u,"📌 "+PN[$("ft").value]+" اتسجلت",$("fa").value+" ج | "+$("fd").value);AUD("إضافة "+PN[$("ft").value],u,a+" | "+d+" | "+$("fn").value.trim());$("fa").value="";$("fn").value=""}).catch(function(e){alert("تعذر الحفظ: "+e.message)})};
 $("fd").value=today();$("md").value=today();
 $("pm").value=today().slice(0,7);$("pm").onchange=drawP;
 $("wm").value=today().slice(0,7);$("wm").onchange=drawW;
@@ -476,15 +476,15 @@ function normA(x){if(x.ts&&x.ts.toDate){var p=cp(x.ts.toDate());x.d=p.year+"-"+p
 var ES=[["e1","الحضور والانصراف"],["e2","مرتبي وسجلي"],["e4","الشغل"],["e5","الطلبات"],["e6","الإشعارات"]],AS=["a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12"];
 function H(i,h){var n=$(i);if(n)n.classList.toggle("hide",h)}
 function allS(){return AS.concat(ES.map(function(e){return e[0]}))}
-function goHome(){allS().forEach(function(k){H(k,true)});H("bk",true);H("et",false);var ax=$("abx");if(ax)ax.style.display=ax.innerHTML?"":"none";document.querySelector(".tabs").classList.remove("hide")}
-function openS(k,t){allS().forEach(function(x){H(x,x!==k)});H("et",true);document.querySelector(".tabs").classList.add("hide");$("bkt").textContent=t;H("bk",false);if($("abx"))$("abx").style.display="none";if(location.hash!=="#s")location.hash="s";if(k==="a3")drawP();if(k==="a12")drawRp();if(k==="e6")setTimeout(function(){if(!$("e6").classList.contains("hide"))markRead()},2500);window.scrollTo(0,0)}
+function goHome(){allS().forEach(function(k){H(k,true)});H("bk",true);H("et",false);H("pnb",false);var ax=$("abx");if(ax)ax.style.display=ax.innerHTML?"":"none";document.querySelector(".tabs").classList.remove("hide")}
+function openS(k,t){allS().forEach(function(x){H(x,x!==k)});H("et",true);H("pnb",true);document.querySelector(".tabs").classList.add("hide");$("bkt").textContent=t;H("bk",false);if($("abx"))$("abx").style.display="none";if(location.hash!=="#s")location.hash="s";if(k==="a3")drawP();if(k==="a12")drawRp();if(k==="e6")setTimeout(function(){if(!$("e6").classList.contains("hide"))markRead()},2500);window.scrollTo(0,0)}
 $("bkb").onclick=function(){if(location.hash)history.back();else goHome()};
 window.onhashchange=function(){if(!location.hash||location.hash==="#")goHome()};
 function ping(t,b){var d=document.createElement("div");d.className="toast";d.innerHTML="<b>🔔 "+esc(t)+"</b><div>"+esc(b)+"</div>";document.body.appendChild(d);setTimeout(function(){d.remove()},7000);if(navigator.vibrate)navigator.vibrate(200);if(window.Notification&&Notification.permission==="granted"){try{new Notification(t,{body:b,icon:$("lg").src})}catch(e){}}}
 function notify(uid,t,b){if(uid)db.collection("announcements").add({title:t,body:b||"",to:uid,toName:(U[uid]||{}).name||"",by:me.email,at:firebase.firestore.FieldValue.serverTimestamp(),auto:true}).catch(NO)}
 function buildEmp(){
   if(!$("e1")){
-    var et=document.createElement("div");et.id="et";$("emp").insertBefore(et,$("emp").firstChild);
+    var et=document.createElement("div");et.id="et";$("emp").insertBefore(et,$("emp").firstChild);var pb=document.createElement("div");pb.id="pnb";$("emp").insertBefore(pb,et);
     var G={e1:["ci"],e2:["mm","mt","myl","myf"],e4:["wk","wkl"],e5:["rt","myr"]};
     Object.keys(G).forEach(function(k){var d=document.createElement("div");d.id=k;d.className="hide";$("emp").appendChild(d);G[k].forEach(function(i){var n=$(i).closest(".c");if(n)d.appendChild(n)})});
     var d6=document.createElement("div");d6.id="e6";d6.className="hide";d6.innerHTML='<div class="c"><b>🔔 الإشعارات</b> <button class="b s" id="npm">تفعيل تنبيهات الجهاز</button><div class="note">التنبيهات بتظهر فوراً طول ما الموقع مفتوح على موبايلك.</div></div><div id="enl"></div>';$("emp").appendChild(d6);
@@ -499,7 +499,7 @@ function drawEN(){
   var n=AN.filter(function(a){return!RD[a.id]}).length,t=document.querySelector('#et [data-e="e6"]'),w=document.querySelector('#et [data-e="e4"]'),r=(ST[me.uid]||{}).role;
   if(t){if(n)t.setAttribute("data-b",n);else t.removeAttribute("data-b")}
   if(w)w.style.display=(r==="tech"||r==="sales")?"":"none";
-  if($("enl"))$("enl").innerHTML=AN.map(function(a){return'<div class="c"><b>'+esc(a.title)+"</b>"+(RD[a.id]?"":' <span class="tg">جديد</span>')+'<div style="white-space:pre-wrap;margin-top:6px">'+esc(a.body)+'</div><div class="note">'+fmt(a.at)+(a.auto?"":" · من الإدارة")+"</div></div>"}).join("")||'<div class="c note">مفيش إشعارات</div>'
+  if($("pnb"))$("pnb").innerHTML=AN.filter(function(a){return a.pin}).map(function(a){return'<div class="c" style="border-color:var(--cy)"><b>📌 '+esc(a.title)+'</b><div style="white-space:pre-wrap;margin-top:6px">'+esc(a.body)+"</div></div>"}).join("");if($("lvn")){var q=stg(me.uid),u=lvUsed(me.uid);$("lvn").textContent="رصيد إجازاتك السنوي: "+q.lb+" يوم، المستهلك "+u+"، المتبقي "+Math.max(0,q.lb-u)}if($("enl"))$("enl").innerHTML=AN.map(function(a){return'<div class="c"><b>'+esc(a.title)+"</b>"+(RD[a.id]?"":' <span class="tg">جديد</span>')+'<div style="white-space:pre-wrap;margin-top:6px">'+esc(a.body)+'</div><div class="note">'+fmt(a.at)+(a.auto?"":" · من الإدارة")+"</div></div>"}).join("")||'<div class="c note">مفيش إشعارات</div>'
 }
 function markRead(){var b=db.batch(),n=0;AN.forEach(function(a){if(!RD[a.id]){b.set(db.collection("reads").doc(a.id+"_"+me.uid),{ann:a.id,uid:me.uid,name:(U[me.uid]||{}).name||"",at:firebase.firestore.FieldValue.serverTimestamp()});n++}});if(n)b.commit().catch(NO)}
 function empExtra(id){
@@ -513,7 +513,7 @@ function empExtra(id){
 }
 /* أدمن: إعلانات + إجازات رسمية */
 document.querySelector(".tabs").insertAdjacentHTML("beforeend",'<button data-t="a10">الإعلانات</button><button data-t="a11">الإجازات الرسمية</button><button data-t="a12">التقارير</button>');
-$("adm").insertAdjacentHTML("beforeend",'<div id="a10" class="hide"><div class="c"><div class="g"><div><label>إلى</label><select id="an_to"></select></div><div style="grid-column:1/-1"><label>العنوان</label><input id="an_t" maxlength="120"></div></div><label style="margin-top:8px">نص القرار أو الخبر</label><textarea id="an_b" maxlength="2000"></textarea><button class="b" id="an_s">إرسال</button><div class="note">بيوصل كإشعار جوه الموقع للموظف (أو لكل الموظفين)، وتنبيه على الجهاز لو فعّله والموقع مفتوح. وبتشوف مين قرأه.</div></div><div class="c sc"><table><thead><tr><th>الوقت</th><th>إلى</th><th>الرسالة</th><th>قرأها</th><th></th></tr></thead><tbody id="anl"></tbody></table></div></div><div id="a11" class="hide"><div class="c"><div class="g"><div><label>التاريخ</label><input id="hd" type="date"></div><div><label>المناسبة</label><input id="hn"></div></div><button class="b" id="hb">إضافة إجازة رسمية</button><div class="note">اليوم ده مفيهوش خصم غياب أو تأخير، ولو حد اشتغل فيه بيتحسب إضافي زي الإجازة الأسبوعية.</div></div><div class="c sc"><table style="min-width:0"><thead><tr><th>التاريخ</th><th>المناسبة</th><th></th></tr></thead><tbody id="hl"></tbody></table></div></div>');
+$("adm").insertAdjacentHTML("beforeend",'<div id="a10" class="hide"><div class="c"><div class="g"><div><label>إلى</label><select id="an_to"></select></div><div style="grid-column:1/-1"><label>العنوان</label><input id="an_t" maxlength="120"></div></div><label style="margin-top:8px">نص القرار أو الخبر</label><textarea id="an_b" maxlength="2000"></textarea><label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="an_pin" style="width:auto"> 📌 تثبيت على رئيسية الموظفين (بيفضل لحد ما تحذفه)</label><button class="b" id="an_s">إرسال</button><div class="note">بيوصل كإشعار جوه الموقع للموظف (أو لكل الموظفين)، وتنبيه على الجهاز لو فعّله والموقع مفتوح. وبتشوف مين قرأه.</div></div><div class="c sc"><table><thead><tr><th>الوقت</th><th>إلى</th><th>الرسالة</th><th>قرأها</th><th></th></tr></thead><tbody id="anl"></tbody></table></div></div><div id="a11" class="hide"><div class="c"><div class="g"><div><label>التاريخ</label><input id="hd" type="date"></div><div><label>المناسبة</label><input id="hn"></div></div><button class="b" id="hb">إضافة إجازة رسمية</button><div class="note">اليوم ده مفيهوش خصم غياب أو تأخير، ولو حد اشتغل فيه بيتحسب إضافي زي الإجازة الأسبوعية.</div></div><div class="c sc"><table style="min-width:0"><thead><tr><th>التاريخ</th><th>المناسبة</th><th></th></tr></thead><tbody id="hl"></tbody></table></div></div>');
 function admExtra(){
   unsubs.push(db.collection("announcements").orderBy("at","desc").limit(100).onSnapshot(function(s){AN=s.docs.map(function(d){var x=d.data({serverTimestamps:"estimate"});x.id=d.id;return x});drawAn()},NO));
   unsubs.push(db.collection("reads").onSnapshot(function(s){RA=s.docs.map(function(d){return d.data()});drawAn()},NO));
@@ -521,7 +521,7 @@ function admExtra(){
 }
 function drawAn(){
   var sel=$("an_to");if(sel&&sel.options.length!==ids().length+1)sel.innerHTML='<option value="all">كل الموظفين</option>'+ids().map(function(id){return'<option value="'+id+'">'+esc(U[id].name)+"</option>"}).join("");
-  $("anl").innerHTML=AN.filter(function(a){return!a.auto}).map(function(a){var n=RA.filter(function(r){return r.ann===a.id}).length;return"<tr><td>"+fmt(a.at)+"</td><td>"+esc(a.to==="all"?"الكل":a.toName)+'</td><td style="white-space:normal;min-width:200px"><b>'+esc(a.title)+'</b><div class="note">'+esc(a.body)+"</div></td><td>"+n+" / "+(a.to==="all"?ids().length:1)+'</td><td><button class="b s" data-dn="'+a.id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="5">لسه مفيش إعلانات</td></tr>'
+  $("anl").innerHTML=AN.filter(function(a){return!a.auto}).map(function(a){var n=RA.filter(function(r){return r.ann===a.id}).length;return"<tr><td>"+fmt(a.at)+"</td><td>"+esc(a.to==="all"?"الكل":a.toName)+'</td><td style="white-space:normal;min-width:200px"><b>'+(a.pin?"📌 ":"")+esc(a.title)+'</b><div class="note">'+esc(a.body)+"</div></td><td>"+n+" / "+(a.to==="all"?ids().length:1)+'</td><td><button class="b s" data-dn="'+a.id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="5">لسه مفيش إعلانات</td></tr>'
 }
 function drawHol(){$("hl").innerHTML=Object.keys(HOL).sort().reverse().map(function(k){return"<tr><td>"+esc(k)+"</td><td>"+esc(HOL[k].name)+'</td><td><button class="b s" data-dh="'+esc(k)+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="3">لسه مفيش إجازات رسمية</td></tr>'}
 function extraAdm(){
@@ -530,7 +530,7 @@ function extraAdm(){
   b("a5",REQ.filter(function(r){return r.status==="pending"}).length);b("a8",WK.filter(function(w){return w.st==="pending"}).length)
 }
 $("an_s").onclick=function(){var t=$("an_t").value.trim(),b=$("an_b").value.trim(),to=$("an_to").value;if(!t||!b)return alert("اكتب العنوان والنص");
-  db.collection("announcements").add({title:t,body:b,to:to,toName:to==="all"?"":(U[to]||{}).name||"",by:me.email,at:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){AUD("إرسال إعلان",to==="all"?null:to,(to==="all"?"للكل | ":"")+t);$("an_t").value="";$("an_b").value="";alert("اتبعت")}).catch(function(e){alert("تعذر الإرسال: "+e.message)})};
+  db.collection("announcements").add({title:t,body:b,to:to,toName:to==="all"?"":(U[to]||{}).name||"",pin:$("an_pin").checked,by:me.email,at:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){AUD("إرسال إعلان",to==="all"?null:to,(to==="all"?"للكل | ":"")+t);$("an_t").value="";$("an_b").value="";alert("اتبعت")}).catch(function(e){alert("تعذر الإرسال: "+e.message)})};
 $("hb").onclick=function(){var d=$("hd").value,n=$("hn").value.trim();if(!d||!n)return alert("اكتب التاريخ والمناسبة");
   db.collection("holidays").doc(d).set({d:d,name:n}).then(function(){AUD("إضافة إجازة رسمية",null,d+" | "+n);$("hn").value=""}).catch(function(e){alert("تعذر الحفظ: "+e.message)})};
 document.addEventListener("click",function(ev){
@@ -556,7 +556,7 @@ $("rm").onclick=function(){var m=$("pm").value;if(!PERM.owner||!CL[m])return ale
   var b=db.batch();ids().forEach(function(id){b.delete(db.collection("payslips").doc(m+"_"+id))});b.delete(db.collection("closures").doc(m));
   b.commit().then(function(){AUD("فتح شهر",null,m)}).catch(function(e){alert("تعذر الفتح: "+e.message)})};
 /* التقارير */
-$("adm").insertAdjacentHTML("beforeend",'<div id="a12" class="hide"><div class="c"><label>الشهر</label><input id="rp_m" type="month"><button class="b" id="rp_x">تصدير التقرير (Excel)</button> <button class="b s" id="rp_b">نسخة احتياطية كاملة</button></div><div class="g" id="rp_c" style="margin-bottom:14px"></div><div class="c sc"><table><thead><tr><th>الموظف</th><th>أيام حضور</th><th>أيام غياب</th><th>دقائق تأخير</th><th>ساعات إضافي</th><th>شغل معتمد</th><th>حوافز</th><th>المستحق</th></tr></thead><tbody id="rp_l"></tbody></table><div class="note">مرتب حسب الحوافز، والأرقام بتتحدث لحظياً. الشهر المقفول بيظهر بأرقامه المثبتة.</div></div></div>');
+$("adm").insertAdjacentHTML("beforeend",'<div id="a12" class="hide"><div class="c"><label>الشهر</label><input id="rp_m" type="month"><button class="b" id="rp_x">تصدير التقرير (Excel)</button> <button class="b s" id="rp_b">نسخة احتياطية كاملة</button> <button class="b s" id="rp_p">🖨️ طباعة</button></div><div class="g" id="rp_c" style="margin-bottom:14px"></div><div class="c sc"><table><thead><tr><th>الموظف</th><th>أيام حضور</th><th>أيام غياب</th><th>دقائق تأخير</th><th>ساعات إضافي</th><th>شغل معتمد</th><th>حوافز</th><th>المستحق</th></tr></thead><tbody id="rp_l"></tbody></table><div class="note">مرتب حسب الحوافز، والأرقام بتتحدث لحظياً. الشهر المقفول بيظهر بأرقامه المثبتة.</div></div></div>');
 $("rp_m").value=today().slice(0,7);$("rp_m").onchange=drawRp;
 function drawRp(){var m=$("rp_m").value||today().slice(0,7),T={t:0,i:0,a:0,l:0};
   RPR=ids().map(function(id){var P=payCalc(id,m);T.t+=P.tot;T.i+=P.inc;T.a+=P.ab;T.l+=P.lm;return[U[id].name,AT.filter(function(a){return a.uid===id&&a.d.slice(0,7)===m&&!a.leave}).length,P.ab,P.lm,r2(P.otH),P.cnt,r2(P.inc),r2(P.tot)]}).sort(function(a,b){return b[6]-a[6]});
@@ -580,6 +580,14 @@ var DP=null;window.addEventListener("beforeinstallprompt",function(e){e.preventD
 $("inst").onclick=function(){if(DP){DP.prompt();DP=null;$("inst").classList.add("hide")}else alert("من زر المشاركة اختار «إضافة إلى الشاشة الرئيسية»")};
 if(/iphone|ipad/i.test(navigator.userAgent)&&!navigator.standalone)$("inst").classList.remove("hide");
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(NO);
+
+/* ===== v6: رصيد الإجازات + جزاءات + فلتر الحضور + مثبّت + طباعة التقرير ===== */
+var PEN=[],PN={advances:"سلفة",bonuses:"مكافأة",penalties:"جزاء"};
+function lvUsed(id){var y=today().slice(0,4);return AT.filter(function(a){return a.uid===id&&a.leave&&a.d.slice(0,4)===y}).length}
+function lvOk(rid){var r=REQ.filter(function(q){return q.id===rid})[0];if(!r||r.type!=="leave")return true;var n=Math.round((new Date((r.d2||r.d1)+"T00:00:00")-new Date(r.d1+"T00:00:00"))/864e5)+1,rem=stg(r.uid).lb-lvUsed(r.uid);return n<=rem||confirm("الطلب "+n+" يوم والمتبقي من رصيده "+Math.max(0,rem)+" بس. تقبله برضه؟")}
+function attF(a){var q=$("fq").value.trim(),f=$("ff").value,t=$("ft2").value,z=$("fz").value;return(!q||((U[a.uid]||{}).name||a.name||"").indexOf(q)>=0)&&(!f||a.d>=f)&&(!t||a.d<=t)&&(z!=="late"||calc(a,stg(a.uid)).late>0)&&(z!=="ex"||a.ex)&&(z!=="open"||(!a.o&&!a.leave))}
+["fq","ff","ft2","fz"].forEach(function(i){$(i).oninput=drawA});
+$("rp_p").onclick=function(){var m=$("rp_m").value;$("ps").innerHTML='<div class="slip"><div style="display:flex;align-items:center;gap:12px;border-bottom:2px solid #163b69;padding-bottom:10px"><img src="'+$("lg").src+'" style="width:64px;height:64px;object-fit:contain"><b style="font-size:20px;color:#163b69">توكيلات محمد فكري</b></div><h2>تقرير شهر '+esc(m)+"</h2><table><tr>"+["الموظف","حضور","غياب","تأخير (د)","إضافي (س)","شغل","حوافز","المستحق"].map(function(h){return"<th>"+h+"</th>"}).join("")+"</tr>"+RPR.map(function(r){return"<tr>"+r.map(function(c){return"<td>"+esc(c)+"</td>"}).join("")+"</tr>"}).join("")+"</table></div>";document.body.classList.add("pr");window.print();document.body.classList.remove("pr")};
 }
 </script>
 </body>
