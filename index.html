@@ -281,16 +281,16 @@ function openInc(id){
   if(role==="tech"){
     g=HP.map(function(k){return'<div><label>تركيب '+k[1]+' حصان (ج للجهاز)</label><input type="number" min="0" id="iv_'+k[0]+'" value="'+((s.instv||{})[k[0]]||"")+'"></div>'}).join("")+'<div><label>الصيانة (ج للعملية)</label><input type="number" min="0" id="iv_m" value="'+(s.maintv||"")+'"></div>'
   }else if(role==="sales"){
-    g=HP.map(function(k){return'<div><label>حافز الجهاز '+k[1]+' حصان (ج)</label><input type="number" min="0" id="sv_'+k[0]+'" value="'+((s.sv||{})[k[0]]||"")+'"></div><div><label>تارجت '+k[1]+' حصان (عدد)</label><input type="number" min="0" id="sq_'+k[0]+'" value="'+((s.st||{})[k[0]]||"")+'"></div>'}).join("")+'<div><label>أقل نسبة تحقيق للتارجت %</label><input type="number" min="0" id="sv_thr" value="'+(s.thr||"")+'"></div><div><label>نسبة صرف الحافز %</label><input type="number" min="0" max="100" id="sv_pp" value="'+s.pp+'"></div>'
+    g=HP.map(function(k){return'<div><label>حافز الجهاز '+k[1]+' حصان (ج)</label><input type="number" min="0" id="sv_'+k[0]+'" value="'+((s.sv||{})[k[0]]||"")+'"></div>'}).join("")+'<div><label>التارجت: إجمالي عدد الأجهزة</label><input type="number" min="0" id="sv_tt" value="'+(s.tt||"")+'"></div><div><label>أقل نسبة تحقيق للتارجت % (أقل منها مفيش حافز)</label><input type="number" min="0" id="sv_thr" value="'+(s.thr||"")+'"></div><div><label>نسبة التحقيق اللي من عندها بياخد الحافز كامل %</label><input type="number" min="0" id="sv_hi" value="'+(s.hi==null?100:s.hi)+'"></div>'
   }
   $("ip").classList.remove("hide");
   if(!g){$("ip").innerHTML=h+'<div class="note">الوظيفة دي من غير حوافز. اختار «فني» أو «مندوب مبيعات» من خانة الوظيفة الأول.</div><button class="b s" data-ipx="1">إغلاق</button>';return}
-  $("ip").innerHTML=h+'<div class="g" style="margin-top:8px">'+g+"</div>"+(role==="sales"?'<div class="note">قيمة المبيعات = عدد الأجهزة × حافز كل قدرة. لو نسبة تحقيق التارجت (قيمة المحقق ÷ قيمة التارجت) وصلت للحد الأدنى، الموظف بياخد «نسبة الصرف» (الافتراضي 50%) من قيمة المحقق، ولو ماوصلش مفيش حافز.</div>':"")+'<button class="b" data-svi="'+id+'">حفظ الحوافز</button> <button class="b s" data-ipx="1">إغلاق</button>'
+  $("ip").innerHTML=h+'<div class="g" style="margin-top:8px">'+g+"</div>"+(role==="sales"?'<div class="note">قيمة الحافز المحقق = عدد الأجهزة × حافز كل قدرة. نسبة التحقيق = الأجهزة المباعة ÷ إجمالي التارجت. أقل من الحد الأدنى: مفيش حافز. بين الحد الأدنى ونسبة الصرف الكامل: الموظف بياخد نسبة التحقيق نفسها من قيمة الحافز المحقق (مثلاً 70% تحقيق = 70% من الحافز). من نسبة الصرف الكامل وأعلى: بياخد 100% من الحافز المحقق. لو التارجت مش مكتوب: الحافز بيتصرف كامل.</div>':"")+'<button class="b" data-svi="'+id+'">حفظ الحوافز</button> <button class="b s" data-ipx="1">إغلاق</button>'
 }
 function saveInc(id,btn){
   var role=$("ro_"+id).value,d={role:role};
   if(role==="tech"){d.instv={};HP.forEach(function(k){d.instv[k[0]]=+$("iv_"+k[0]).value||0});d.maintv=+$("iv_m").value||0}
-  if(role==="sales"){d.sv={};d.st={};HP.forEach(function(k){d.sv[k[0]]=+$("sv_"+k[0]).value||0;d.st[k[0]]=+$("sq_"+k[0]).value||0});d.thr=+$("sv_thr").value||0;d.pp=$("sv_pp").value===""?50:+$("sv_pp").value}
+  if(role==="sales"){d.sv={};HP.forEach(function(k){d.sv[k[0]]=+$("sv_"+k[0]).value||0});d.tt=+$("sv_tt").value||0;d.thr=+$("sv_thr").value||0;d.hi=$("sv_hi").value===""?100:+$("sv_hi").value}
   db.collection("settings").doc(id).set(d,{merge:true}).then(function(){btn.textContent="اتحفظ ✓";AUD("تعديل قيم حوافز",id,"")}).catch(function(e){alert("تعذر الحفظ: "+e.message)})
 }
 function drawBr(){
@@ -366,7 +366,7 @@ function drawMe(){mload($("mm").value);
   $("st").textContent=!t?"لسه ماسجلتش حضور النهارده":t.leave?"النهارده إجازة":!t.o?"حضورك مسجل الساعة "+t.i:"اتسجل حضورك "+t.i+" وانصرافك "+t.o;
   $("mn").textContent=CL[m]?"🔒 الشهر مقفول والأرقام نهائية":P.s.net?"":"الإدارة لسه ماحددتش مرتبك";
   var R=[["الصافي الأساسي",P.s.net,""],["الإضافي ("+r2(P.otH)+" ساعة)",P.op,"+"],["حوافز ("+P.cnt+")",P.inc,"+"],["مكافآت",P.bon,"+"],["خصم التأخير والانصراف المبكر ("+hm(P.lm)+")",P.ld,"-"],["خصم الغياب ("+P.ab+" يوم)",P.ad,"-"],["خصومات ثابتة",P.s.d,"-"],["سلف وجزاءات",P.adv,"-"]];
-  $("mt").innerHTML=R.map(function(r){return"<tr><td>"+r[0]+'</td><td class="'+(r[1]&&r[2]=="-"?"neg":r[1]&&r[2]=="+"?"pos":"")+'">'+(r[1]&&r[2]?r[2]+" ":"")+money(r[1])+"</td></tr>"}).join("")+"<tr><td><b>المستحق المتوقع</b></td><td><b>"+money(P.tot)+"</b></td></tr>";$("bigtot").textContent=money(P.tot);$("bignow").textContent=money(accr(P,m));heroU();var ev=EV[m+"_"+id],tg=P.s.tb>0&&P.dy!=null?" · التارجت: "+(P.s.tw?P.cnt+"/"+P.s.tw+" شغل ":"")+(P.s.ta?P.dy+"/"+P.s.ta+" يوم ":"")+(P.tg?"✓ اتحقق":""):"";$("evn").textContent=(ev?"تقييمك: "+ev.score+"/10"+(ev.note?" — "+ev.note:""):"")+tg+(P.s.role==="sales"&&P.ach!=null?" · تحقيق التارجت "+Math.round(P.ach)+"% (الحد الأدنى "+P.s.thr+"%)":"");
+  $("mt").innerHTML=R.map(function(r){return"<tr><td>"+r[0]+'</td><td class="'+(r[1]&&r[2]=="-"?"neg":r[1]&&r[2]=="+"?"pos":"")+'">'+(r[1]&&r[2]?r[2]+" ":"")+money(r[1])+"</td></tr>"}).join("")+"<tr><td><b>المستحق المتوقع</b></td><td><b>"+money(P.tot)+"</b></td></tr>";$("bigtot").textContent=money(P.tot);$("bignow").textContent=money(accr(P,m));heroU();var ev=EV[m+"_"+id],tg=P.s.tb>0&&P.dy!=null?" · التارجت: "+(P.s.tw?P.cnt+"/"+P.s.tw+" شغل ":"")+(P.s.ta?P.dy+"/"+P.s.ta+" يوم ":"")+(P.tg?"✓ اتحقق":""):"";$("evn").textContent=(ev?"تقييمك: "+ev.score+"/10"+(ev.note?" — "+ev.note:""):"")+tg+(P.s.role==="sales"&&P.ach!=null?(P.s.tt>0?" · تحقيق التارجت "+P.cnt+"/"+P.s.tt+" جهاز ("+Math.round(P.ach)+"%) — الحد الأدنى "+P.s.thr+"% والصرف الكامل من "+P.s.hi+"%":""):"");
   var rows=AT.filter(function(a){return a.d.slice(0,7)===m}).sort(function(a,b){return a.d<b.d?1:-1});
   $("myl").innerHTML=rows.map(function(a){var c=calc(a,P.s);return"<tr><td>"+esc(a.d)+"</td><td>"+esc(a.leave?"إجازة":a.i)+"</td><td>"+esc(a.o||"-")+"</td><td>"+(c.late?hm(c.late):"0")+(c.early>30&&!a.ex?" | مبكر "+hm(c.early):"")+"</td><td>"+(c.ot?r2(c.ot):"0")+"</td></tr>"}).join("")||'<tr><td colspan="5">مفيش تسجيلات</td></tr>';
   drawMeX(id,m,P);if(typeof drawEN==="function")drawEN();
@@ -407,7 +407,7 @@ function drawAdm(){
 function AUD(act,uid,det){db.collection("audit").add({by:me.email,at:firebase.firestore.FieldValue.serverTimestamp(),act:act,who:uid?((U[uid]||{}).name||""):"",det:det||""}).catch(function(){})}
 function drawAu(){$("aul").innerHTML=AU.map(function(a){var t=a.at&&a.at.toDate?a.at.toDate().toLocaleString("ar-EG",{timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"short"}):"";return"<tr><td>"+esc(t)+'</td><td dir="ltr">'+esc(a.by)+"</td><td><b>"+esc(a.act)+"</b></td><td>"+esc(a.who)+"</td><td>"+esc(a.det)+"</td></tr>"}).join("")||'<tr><td colspan="5">مفيش سجل لسه</td></tr>'}
 function drawAll(){drawE();drawA();drawP();drawF();drawReq();drawAdm();drawBr();drawW();extraAdm();drawHq()}
-function stg(uid){var s=ST[uid]||{};return{net:+s.net||0,h:+s.hours||8,t:s.start||"09:00",d:+s.ded||0,off:s.off==null?5:+s.off,role:s.role||"other",branch:s.branch||"",instv:s.instv||{},maintv:+s.maintv||0,sp:s.sp||{},lb:s.lb==null?21:+s.lb,otm:s.otm==null?2:(+s.otm||2),tw:+s.tw||0,ta:+s.ta||0,tb:+s.tb||0,sv:s.sv||{},st:s.st||{},thr:+s.thr||0,pp:s.pp==null?50:+s.pp,shd:s.shd||{},mt:s.mt||{}}}
+function stg(uid){var s=ST[uid]||{};return{net:+s.net||0,h:+s.hours||8,t:s.start||"09:00",d:+s.ded||0,off:s.off==null?5:+s.off,role:s.role||"other",branch:s.branch||"",instv:s.instv||{},maintv:+s.maintv||0,sp:s.sp||{},lb:s.lb==null?21:+s.lb,otm:s.otm==null?2:(+s.otm||2),tw:+s.tw||0,ta:+s.ta||0,tb:+s.tb||0,sv:s.sv||{},tt:+s.tt||0,thr:+s.thr||0,hi:s.hi==null?100:(+s.hi||100),shd:s.shd||{},mt:s.mt||{}}}
 function earlyFrac(e){return e<=30?0:e<=60?0.25:e<=90?0.5:1}
 function calc(a,s){
   if(a.leave)return{late:0,early:0,frac:0,w:0,ot:0};s=sD(s,a.d);
@@ -451,7 +451,7 @@ function payCalc0(id,m){var z=PS[id+"_"+m];if(z)return{s:Object.assign(stg(id),{
   var s=stg(id),day=s.net/30,hr=day/s.h,ot=0,ld=0,lm=0;
   AT.forEach(function(a){if(a.uid!==id||a.d.slice(0,7)!==m)return;var c=calc(a,s);ot+=c.ot;ld+=c.frac*day;lm+=c.frac?c.late+c.early:0});
   var ab=absDays(id,s,m),adv=sumA(ADV,id,m)+sumL(PEN,id,m),bon=sumL(BON,id,m),op=ot*s.otm*hr,ad=ab*day,inc=0,cnt=0;WK.forEach(function(w){if(w.uid===id&&w.d.slice(0,7)===m&&(w.st||"approved")==="approved"){inc+=incOf(w,s);cnt+=(+w.qty||0)}});
-  var ach=0;if(s.role==="sales"){var tv=0;HP.forEach(function(k){tv+=(+(s.st||{})[k[0]]||0)*(+(s.sv||{})[k[0]]||0)});ach=tv>0?inc/tv*100:0;inc=tv>0&&ach>=s.thr?inc*s.pp/100:0}var dy=AT.filter(function(a){return a.uid===id&&a.d.slice(0,7)===m&&!a.leave}).length,tg=tgt(s,cnt,dy);bon+=tg;return{s:s,otH:ot,op:op,lm:lm,ld:ld,ab:ab,ad:ad,adv:adv,bon:bon,inc:inc,cnt:cnt,dy:dy,tg:tg,ach:ach,tot:s.net+op+inc+bon-ld-ad-s.d-adv}
+  var ach=0;if(s.role==="sales"&&s.tt>0){ach=cnt/s.tt*100;inc=ach<s.thr?0:ach>=s.hi?inc:inc*Math.min(ach,100)/100}var dy=AT.filter(function(a){return a.uid===id&&a.d.slice(0,7)===m&&!a.leave}).length,tg=tgt(s,cnt,dy);bon+=tg;return{s:s,otH:ot,op:op,lm:lm,ld:ld,ab:ab,ad:ad,adv:adv,bon:bon,inc:inc,cnt:cnt,dy:dy,tg:tg,ach:ach,tot:s.net+op+inc+bon-ld-ad-s.d-adv}
 }
 function recSum(st,m,t){return(st.rec||[]).filter(function(r){return r.t===t&&(!r.f||r.f<=m)&&(!r.e||r.e>=m)}).reduce(function(a,r){return a+(+r.a||0)},0)}
 function payCalc(id,m){
