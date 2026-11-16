@@ -231,7 +231,7 @@ $("out").onclick=function(){auth.signOut()};
 (function(){var l=document.createElement("link");l.rel="icon";l.href=$("lg").src;document.head.appendChild(l)})();
 
 auth.onAuthStateChanged(function(u){
-  document.body.classList.remove("isemp");PM={};EV={};DVS={};UL=0;unsubs.forEach(function(f){f()});unsubs=[];me=u;U={};ST={};AT=[];ADV=[];BON=[];REQ=[];ADMS=[];PERM=null;BR={};WK=[];wgRole=null;AN=[];RD={};RA=[];HOL={};AN1={};AN2={};CL={};PS={};PEN=[];
+  document.body.classList.remove("isemp");PM={};EV={};DVS={};UL=0;MS={};MD={};MC={};LV=[];MQ=null;unsubs.forEach(function(f){f()});unsubs=[];me=u;U={};ST={};AT=[];ADV=[];BON=[];REQ=[];ADMS=[];PERM=null;BR={};WK=[];wgRole=null;AN=[];RD={};RA=[];HOL={};AN1={};AN2={};CL={};PS={};PEN=[];
   $("auth").classList.toggle("hide",!!u);$("app").classList.toggle("hide",!u);
   if(!u)return;
   var own=(u.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();
@@ -282,7 +282,7 @@ function saveInc(id,btn){
 function drawBr(){
   $("bl").innerHTML=Object.keys(BR).map(function(id){var b=BR[id];return"<tr><td>"+esc(b.name)+'</td><td dir="ltr"><a href="https://www.google.com/maps?q='+esc(b.lat)+","+esc(b.lng)+'" target="_blank" rel="noopener">'+esc(b.lat)+", "+esc(b.lng)+"</a></td><td>"+esc(b.r)+' م</td><td><button class="b s" data-be="'+id+'">تعديل النطاق</button> <button class="b s" data-bd="'+id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="4">لسه مفيش فروع</td></tr>'
 }
-function drawW(){
+function drawW(){mload($("wm").value);
   var m=$("wm").value||today().slice(0,7);
   var rows=WK.filter(function(w){return w.d.slice(0,7)===m}).sort(function(a,b){return a.d<b.d?1:-1});
   $("wal").innerHTML=rows.map(function(w){return"<tr><td>"+esc(w.d)+"</td><td>"+esc((U[w.uid]||{}).name||w.name)+"</td><td>"+TL[w.type]+"</td><td>"+(w.type==="maint"?"-":hpl(w.hp))+"</td><td>"+esc(w.qty)+"</td><td>"+(w.st==="pending"?"⏳":w.st==="rejected"?"مرفوض":r2(incOf(w,stg(w.uid))))+"</td><td>"+esc((w.cust?w.cust+" | ":"")+(w.note||""))+'</td><td>'+(w.st==="pending"?'<button class="b s" data-wa="'+w.id+'">اعتماد</button> <button class="b s" data-wr="'+w.id+'">رفض</button> ':"")+'<button class="b s" data-dw="'+w.id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="8">مفيش شغل مسجل في الشهر ده</td></tr>'
@@ -304,7 +304,9 @@ function startEmp(){
   function on(q,f){unsubs.push(q.onSnapshot(function(s){f(s);drawMe()},function(e){$("st").textContent="تعذر تحميل البيانات: "+e.message}))}
   on(db.collection("users").doc(id),function(d){if(d.exists){U[id]=d.data();$("who").textContent=U[id].name}});
   on(db.collection("settings").doc(id),function(d){ST[id]=d.exists?d.data():{}});
-  on(db.collection("att").where("uid","==",id),function(s){AT=mk(s)});
+  MQ=function(m){MS[m]=1;MD[m]={att:[]};MC[m]=1;var f=0;unsubs.push(db.collection("att").where("uid","==",id).where("d",">=",m+"-01").where("d","<=",m+"-31").onSnapshot(function(s){MD[m].att=mk(s);if(!f){f=1;MC[m]--}mrb();drawMe()},function(e){if(!f){f=1;MC[m]--}$("st").textContent="تعذر تحميل الحضور: "+e.message}))};
+  on(db.collection("att").where("uid","==",id).where("leave","==",true),function(s){LV=mk(s)});
+  var cm=today().slice(0,7);mload(cm);mload(pmo(cm));
   on(db.collection("advances").where("uid","==",id),function(s){ADV=mk(s)});
   on(db.collection("bonuses").where("uid","==",id),function(s){BON=mk(s)});on(db.collection("penalties").where("uid","==",id),function(s){PEN=mk(s)});
   on(db.collection("requests").where("uid","==",id),function(s){REQ=mk(s)});
@@ -339,7 +341,7 @@ function startEmp(){
   $("mm").onchange=drawMe;$("mm").value=today().slice(0,7);empExtra(id);
 }
 var SL={pending:"قيد المراجعة",approved:"مقبول",rejected:"مرفوض"};
-function drawMe(){
+function drawMe(){mload($("mm").value);
   var id=me.uid,m=$("mm").value||today().slice(0,7),P=payCalc(id,m),t=AT.filter(function(a){return a.d===today()})[0];
   $("ci").disabled=!!t;$("co").disabled=!t||!!t.o||!!t.leave;
   $("st").textContent=!t?"لسه ماسجلتش حضور النهارده":t.leave?"النهارده إجازة":!t.o?"حضورك مسجل الساعة "+t.i:"اتسجل حضورك "+t.i+" وانصرافك "+t.o;
@@ -355,6 +357,12 @@ function drawMe(){
 }
 
 /* ===== الأدمن ===== */
+var MS={},MD={},MC={},LV=[],MQ=null;
+function pmo(m){var y=+m.slice(0,4),k=+m.slice(5,7)-1;return k?y+"-"+p2(k):(y-1)+"-12"}
+function mload(m){if(MQ&&m&&/^\d{4}-\d{2}$/.test(m)&&!MS[m])MQ(m)}
+function mReady(m){return !!MS[m]&&MC[m]===0}
+function mloadR(f,t){if(!f)return;var a=f.slice(0,7),b=(t||today()).slice(0,7),n=0;while(a<=b&&n++<24){mload(a);var y=+a.slice(0,4),k=+a.slice(5,7);a=k===12?(y+1)+"-01":y+"-"+p2(k+1)}}
+function mrb(){var o={};Object.keys(MD).forEach(function(m){Object.keys(MD[m]).forEach(function(k){o[k]=(o[k]||[]).concat(MD[m][k])})});if(o.att)AT=o.att;if(o.work)WK=o.work}
 function startAdmin(){
   admExtra();
   $("who").textContent=PERM.owner?"لوحة الأدمن":"أدمن: "+me.email;
@@ -362,9 +370,11 @@ function startAdmin(){
   function mk(s){return s.docs.map(function(d){var x=d.data({serverTimestamps:"estimate"});x.id=d.id;return normA(x)})}
   on("users",function(s){UL=1;U={};s.forEach(function(d){U[d.id]=d.data()})});
   if(PERM.pay||PERM.edit)on("settings",function(s){ST={};s.forEach(function(d){ST[d.id]=d.data()})});
-  on("att",function(s){AT=mk(s)});
+  MQ=function(m){MS[m]=1;var ks=["att"];if(PERM.att||PERM.pay)ks.push("work");MD[m]={};MC[m]=ks.length;
+    ks.forEach(function(k){MD[m][k]=[];var f=0;unsubs.push(db.collection(k).where("d",">=",m+"-01").where("d","<=",m+"-31").onSnapshot(function(s){MD[m][k]=mk(s);if(!f){f=1;MC[m]--}mrb();drawAll();if(typeof drawPf==="function"&&pfId)drawPf(1)},function(e){console.error(k,e.message);if(!f){f=1;MC[m]--}}))})};
+  unsubs.push(db.collection("att").where("leave","==",true).onSnapshot(function(s){LV=mk(s);drawAll()},function(e){console.error("leave",e.message)}));
+  var cm=today().slice(0,7);mload(cm);mload(pmo(cm));
   on("branches",function(s){BR={};s.forEach(function(d){BR[d.id]=d.data()})});
-  if(PERM.att||PERM.pay)on("work",function(s){WK=mk(s)});
   if(PERM.fin||PERM.pay){on("advances",function(s){ADV=mk(s)});on("bonuses",function(s){BON=mk(s)});on("penalties",function(s){PEN=mk(s)})}
   if(PERM.fin)on("requests",function(s){REQ=mk(s)});
   if(PERM.owner)on("admins",function(s){ADMS=mk(s)});
@@ -402,7 +412,7 @@ function drawE(){
     '<td><select id="ro_'+id+'">'+roleOpts(s.role)+"</select></td>"+'<td><select id="br_'+id+'">'+brOpts(s.branch)+"</select></td>"+'<td><input type="number" min="0" id="lb_'+id+'" value="'+s.lb+'"></td>'+'<td><input type="number" step="0.25" min="1" id="om_'+id+'" value="'+s.otm+'"></td>'+'<td><button class="b s" data-sv="'+id+'">حفظ</button> <button class="b s" data-ic="'+id+'">حوافز</button> <button class="b s" data-pf="'+id+'">ملف الموظف</button></td></tr>'}).join("")||(UL?'<tr><td colspan="11">لسه مفيش موظفين سجلوا</td></tr>':'<tr><td colspan="11"><div class="skl"></div><div class="skl"></div><div class="skl"></div></td></tr>');
   ["ms","fs"].forEach(function(i){var sel=$(i);if(sel.options.length!==ids().length)sel.innerHTML=ids().map(function(id){return'<option value="'+id+'">'+esc(U[id].name)+"</option>"}).join("")})
 }
-function drawA(){
+function drawA(){mloadR($("ff").value,$("ft2").value);
   var rows=AT.slice().sort(function(a,b){return a.d<b.d?1:-1}).filter(attF);
   $("al").innerHTML=rows.map(function(a){var s=stg(a.uid),c=calc(a,s);
     return"<tr><td>"+esc(a.d)+"</td><td>"+esc((U[a.uid]||{}).name||a.name)+"</td><td>"+esc(a.leave?"إجازة":a.i)+"</td><td>"+(a.o?esc(a.o):a.leave?"-":'<span class="tg or">لسه ماانصرفش</span>')+(a.ex?' <span class="tg bl">بإذن</span>':"")+"</td><td>"+r2(c.w)+"</td><td>"+(c.ot?'<span class="pos">'+r2(c.ot)+"</span>":"0")+"</td><td>"+(c.late?'<span class="neg">'+c.late+" د</span>":"0")+(c.early>30&&!a.ex?' <span class="neg">مبكر '+c.early+" د</span>":"")+'</td><td>'+locTxt(a)+dvTag(a)+'</td><td>'+(!a.o&&!a.leave?'<button class="b s" data-xo="'+a.id+'">انصراف الآن</button> ':"")+'<button class="b s" data-ed="'+a.id+'">تعديل</button> <button class="b s" data-da="'+a.id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="9">لسه مفيش تسجيلات</td></tr>'
@@ -423,7 +433,7 @@ function payCalc(id,m){var z=PS[id+"_"+m];if(z)return{s:Object.assign(stg(id),{n
   var ab=absDays(id,s,m),adv=sumA(ADV,id,m)+sumL(PEN,id,m),bon=sumL(BON,id,m),op=ot*s.otm*hr,ad=ab*day,inc=0,cnt=0;WK.forEach(function(w){if(w.uid===id&&w.d.slice(0,7)===m&&(w.st||"approved")==="approved"){inc+=incOf(w,s);cnt+=(+w.qty||0)}});
   var ach=0;if(s.role==="sales"){var tv=0;HP.forEach(function(k){tv+=(+(s.st||{})[k[0]]||0)*(+(s.sv||{})[k[0]]||0)});ach=tv>0?inc/tv*100:0;inc=tv>0&&ach>=s.thr?inc*s.pp/100:0}var dy=AT.filter(function(a){return a.uid===id&&a.d.slice(0,7)===m&&!a.leave}).length,tg=tgt(s,cnt,dy);bon+=tg;return{s:s,otH:ot,op:op,lm:lm,ld:ld,ab:ab,ad:ad,adv:adv,bon:bon,inc:inc,cnt:cnt,dy:dy,tg:tg,ach:ach,tot:s.net+op+inc+bon-ld-ad-s.d-adv}
 }
-function drawP(){
+function drawP(){var _m=$("pm").value;mload(_m);if(_m&&!mReady(_m)){PR=[];$("pl").innerHTML='<tr><td colspan="12">⏳ جاري تحميل بيانات الشهر...</td></tr>';return}
   var m=$("pm").value;PR=[];if($("cs")){$("cs").textContent=CL[m]?"🔒 الشهر مقفول":"الشهر مفتوح";$("cm").style.display=PERM&&PERM.pay?"":"none";$("rm").style.display=PERM&&PERM.owner?"":"none"}
   $("pl").innerHTML=ids().map(function(id){var P=payCalc(id,m),n=function(v){return v?'<span class="neg">'+r2(v)+"</span>":"0"};
     PR.push([U[id].name,P.s.net,r2(P.op),r2(P.inc),r2(P.bon),r2(P.ld),P.ab,r2(P.ad),P.s.d,r2(P.adv),r2(P.tot)]);
@@ -582,7 +592,7 @@ var CL={},PS={},RPR=[];
 function redraw(){if(isAdmin)drawAll();else drawMe()}
 function CLX(q){unsubs.push(db.collection("closures").onSnapshot(function(s){CL={};s.forEach(function(d){CL[d.id]=d.data()});redraw()},NO));if(q)unsubs.push(q.onSnapshot(function(s){PS={};s.forEach(function(d){var x=d.data();PS[x.uid+"_"+x.m]=x});redraw()},NO))}
 $("a3").insertAdjacentHTML("afterbegin",'<div class="c"><button class="b" id="cm">🔒 إقفال الشهر</button> <button class="b s" id="rm">فتح الشهر (صاحب الحساب)</button> <b id="cs" class="note"></b><div class="note">إقفال الشهر بيثبّت المرتبات ومحدش يقدر يعدل في حضور أو سلف أو شغل الشهر ده. تقدر تقفل الشهور اللي خلصت بس.</div></div>');
-$("cm").onclick=function(){var m=$("pm").value;if(!PERM.pay)return;if(m>=today().slice(0,7))return alert("تقدر تقفل الشهور اللي خلصت بس");if(CL[m])return alert("الشهر مقفول بالفعل");if(!confirm("إقفال شهر "+m+"؟ الأرقام هتتثبت ومحدش هيقدر يعدل فيه."))return;
+$("cm").onclick=function(){var m=$("pm").value;if(!PERM.pay)return;if(m>=today().slice(0,7))return alert("تقدر تقفل الشهور اللي خلصت بس");if(CL[m])return alert("الشهر مقفول بالفعل");if(!mReady(m))return alert("جاري تحميل بيانات الشهر، استنى ثانية وجرّب تاني");if(!confirm("إقفال شهر "+m+"؟ الأرقام هتتثبت ومحدش هيقدر يعدل فيه."))return;
   var b=db.batch();ids().forEach(function(id){var P=payCalc(id,m);b.set(db.collection("payslips").doc(m+"_"+id),{uid:id,name:U[id].name,m:m,net:P.s.net,ded:P.s.d,op:P.op,otH:P.otH,inc:P.inc,cnt:P.cnt,bon:P.bon,ld:P.ld,lm:P.lm,ab:P.ab,ad:P.ad,adv:P.adv,tot:P.tot})});
   b.set(db.collection("closures").doc(m),{m:m,by:me.email,at:firebase.firestore.FieldValue.serverTimestamp()});
   b.commit().then(function(){AUD("إقفال شهر",null,m)}).catch(function(e){alert("تعذر الإقفال: "+e.message)})};
@@ -592,7 +602,7 @@ $("rm").onclick=function(){var m=$("pm").value;if(!PERM.owner||!CL[m])return ale
 /* التقارير */
 $("adm").insertAdjacentHTML("beforeend",'<div id="a12" class="hide"><div class="c"><label>الشهر</label><input id="rp_m" type="month"><button class="b" id="rp_x">تصدير التقرير (Excel)</button> <button class="b s" id="rp_b">نسخة احتياطية كاملة</button> <button class="b s" id="rp_p">🖨️ طباعة</button></div><div class="g" id="rp_c" style="margin-bottom:14px"></div><div class="c" id="rp_g"></div><div class="c sc"><table><thead><tr><th>الموظف</th><th>أيام حضور</th><th>أيام غياب</th><th>دقائق تأخير</th><th>ساعات إضافي</th><th>شغل معتمد</th><th>حوافز</th><th>المستحق</th></tr></thead><tbody id="rp_l"></tbody></table><div class="note">مرتب حسب الحوافز، والأرقام بتتحدث لحظياً. الشهر المقفول بيظهر بأرقامه المثبتة.</div></div></div>');
 $("rp_m").value=today().slice(0,7);$("rp_m").onchange=drawRp;
-function drawRp(){var m=$("rp_m").value||today().slice(0,7),T={t:0,i:0,a:0,l:0};
+function drawRp(){mload($("rp_m").value);var m=$("rp_m").value||today().slice(0,7),T={t:0,i:0,a:0,l:0};
   RPR=ids().map(function(id){var P=payCalc(id,m);T.t+=P.tot;T.i+=P.inc;T.a+=P.ab;T.l+=P.lm;return[U[id].name,AT.filter(function(a){return a.uid===id&&a.d.slice(0,7)===m&&!a.leave}).length,P.ab,P.lm,r2(P.otH),P.cnt,r2(P.inc),r2(P.tot)]}).sort(function(a,b){return b[6]-a[6]});
   var K=function(t,v){return'<div class="c ctr" style="margin:0"><div class="note">'+t+'</div><b style="font-size:20px">'+v+"</b></div>"};
   $("rp_c").innerHTML=K("إجمالي المرتبات",r2(T.t))+K("إجمالي الحوافز",r2(T.i))+K("أيام الغياب",T.a)+K("دقائق التأخير",T.l);
@@ -619,7 +629,7 @@ if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(
 
 /* ===== v6: رصيد الإجازات + جزاءات + فلتر الحضور + مثبّت + طباعة التقرير ===== */
 var PEN=[],PN={advances:"سلفة",bonuses:"مكافأة",penalties:"جزاء"};
-function lvUsed(id){var y=today().slice(0,4);return AT.filter(function(a){return a.uid===id&&a.leave&&a.d.slice(0,4)===y}).length}
+function lvUsed(id){var y=today().slice(0,4);return LV.filter(function(a){return a.uid===id&&a.leave&&a.d.slice(0,4)===y}).length}
 function lvOk(rid){var r=REQ.filter(function(q){return q.id===rid})[0];if(!r||r.type!=="leave")return true;var n=Math.round((new Date((r.d2||r.d1)+"T00:00:00")-new Date(r.d1+"T00:00:00"))/864e5)+1,rem=stg(r.uid).lb-lvUsed(r.uid);return n<=rem||confirm("الطلب "+n+" يوم والمتبقي من رصيده "+Math.max(0,rem)+" بس. تقبله برضه؟")}
 function attF(a){var q=$("fq").value.trim(),f=$("ff").value,t=$("ft2").value,z=$("fz").value;return(!q||((U[a.uid]||{}).name||a.name||"").indexOf(q)>=0)&&(!f||a.d>=f)&&(!t||a.d<=t)&&(z!=="late"||calc(a,stg(a.uid)).late>0)&&(z!=="ex"||a.ex)&&(z!=="open"||(!a.o&&!a.leave))}
 ["fq","ff","ft2","fz"].forEach(function(i){$(i).oninput=drawA});
@@ -642,7 +652,7 @@ function ou(){ob.style.display=navigator.onLine?"none":"block"}addEventListener(
 $("a1").insertAdjacentHTML("afterbegin",'<div id="pf" class="c hide"></div>');
 var pfId=null,pfM=today().slice(0,7),LD="#fb,#mb,#aa,#ba,#wb,#rq,#an_s,#hb,[data-sv],[data-svi],[data-sev],[data-stg]";
 function openPf(id){pfId=id;$("pf").classList.remove("hide");drawPf(1);$("pf").scrollIntoView({behavior:"smooth"})}
-function drawPf(f){var id=pfId;if(!id)return;var fo=document.activeElement;if(!f&&$("pf").contains(fo)&&fo.tagName!=="BUTTON")return;
+function drawPf(f){var id=pfId;if(!id)return;mload(pfM);var fo=document.activeElement;if(!f&&$("pf").contains(fo)&&fo.tagName!=="BUTTON")return;
   var u=U[id]||{},m=pfM,P=payCalc(id,m),s=P.s,ev=EV[m+"_"+id]||{},inM=function(x){return x.uid===id&&x.d.slice(0,7)===m};
   var T=function(r,e){return'<div class="sc"><table style="min-width:0">'+(e?"<thead><tr>"+e.map(function(x){return"<th>"+x+"</th>"}).join("")+"</tr></thead>":"")+"<tbody>"+(r.length?r.map(function(x){return"<tr>"+x.map(function(c){return"<td>"+c+"</td>"}).join("")+"</tr>"}).join(""):'<tr><td colspan="9">مفيش</td></tr>')+"</tbody></table></div>"},B=function(t){return'<div style="margin-top:14px"><b>'+t+"</b></div>"};
   var S=[["الصافي الأساسي",s.net],["إضافي ("+r2(P.otH)+" س × "+s.otm+")",P.op],["حوافز ("+P.cnt+")",P.inc],["مكافآت"+(P.tg?" (منها تارجت "+P.tg+")":""),P.bon],["خصم التأخير والانصراف المبكر",-P.ld],["الغياب ("+P.ab+" يوم)",-P.ad],["خصومات ثابتة",-s.d],["سلف وجزاءات",-P.adv]].map(function(r){return[r[0],money(r[1])]});S.push(["<b>المستحق</b>","<b>"+money(P.tot)+"</b>"]);S.push(["المرتب حتى النهارده",money(accr(P,m))]);
