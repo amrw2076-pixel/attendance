@@ -246,7 +246,7 @@ auth.onAuthStateChanged(function(u){
     $("adm").classList.toggle("hide",!isAdmin);$("emp").classList.toggle("hide",isAdmin);
     $("who").textContent=u.email;document.body.classList.toggle("isemp",!isAdmin);
     if(isAdmin){
-      p.any=1;p.full=!!(p.owner||(p.pay&&p.edit&&p.att&&p.fin));var need={a1:"edit",a2:"att",a3:"pay",a4:"fin",a5:"fin",a6:"owner",a7:"edit",a8:"att",a9:"full",a10:"any",a11:"att",a12:"pay",a13:"any"},first=null;
+      p.any=1;p.full=!!(p.owner||(p.pay&&p.edit&&p.att&&p.fin));var need={a1:"edit",a2:"att",a3:"pay",a4:"fin",a5:"fin",a6:"owner",a7:"edit",a8:"att",a9:"full",a10:"any",a11:"att",a12:"pay",a13:"any",a14:"att"},first=null;
       document.querySelectorAll(".tabs button").forEach(function(b){var ok=!!p[need[b.dataset.t]];b.style.display=ok?"":"none";if(ok&&!first)first=b});
       startAdmin();goHome()
     }else{startEmp();buildEmp()}
@@ -315,7 +315,7 @@ function startEmp(){
     if(e.code==="failed-precondition"&&!EF){EF=1;Object.keys(MD).forEach(function(k){MD[k]={att:[]}});MQ=function(mm){MS[mm]=1;MC[mm]=0};unsubs.push(db.collection("att").where("uid","==",id).onSnapshot(function(s2){MD.all={att:mk(s2)};mrb();drawMe()}))}
     else if(!EF)$("st").textContent="تعذر تحميل الحضور: "+e.message}))};
   on(db.collection("att").doc(id+"_"+today()),function(d){TD=d.exists?normA(Object.assign({id:d.id},d.data({serverTimestamps:"estimate"}))):null});
-  var iv=setInterval(function(){var t=TD,s0=stg(id);if(!t||t.o||t.leave||!t.i)return;if(mins(nowT())<mins(s0.t)+Math.round(s0.h*60))return;var k="rem_"+id+"_"+today();try{if(localStorage.getItem(k))return;localStorage.setItem(k,1)}catch(e){}
+  var iv=setInterval(function(){var t=TD,s0=sD(stg(id),today());if(!t||t.o||t.leave||!t.i)return;if(mins(nowT())<mins(s0.t)+Math.round(s0.h*60))return;var k="rem_"+id+"_"+today();try{if(localStorage.getItem(k))return;localStorage.setItem(k,1)}catch(e){}
     alert("⏰ فاكر تسجل انصراف؟ ميعاد انصرافك عدّى");try{if(window.Notification&&Notification.permission==="granted"&&document.hidden)new Notification("توكيلات محمد فكري",{body:"فاكر تسجل انصراف؟",icon:$("lg").src})}catch(e){}},60000);unsubs.push(function(){clearInterval(iv)});
   on(db.collection("att").where("uid","==",id).where("leave","==",true),function(s){LV=mk(s)});
   var cm=today().slice(0,7);mload(cm);mload(pmo(cm));
@@ -358,10 +358,10 @@ function drawMe(){mload($("mm").value);
   $("ci").disabled=!!t;$("co").disabled=!t||!!t.o||!!t.leave;
   $("st").textContent=!t?"لسه ماسجلتش حضور النهارده":t.leave?"النهارده إجازة":!t.o?"حضورك مسجل الساعة "+t.i:"اتسجل حضورك "+t.i+" وانصرافك "+t.o;
   $("mn").textContent=CL[m]?"🔒 الشهر مقفول والأرقام نهائية":P.s.net?"":"الإدارة لسه ماحددتش مرتبك";
-  var R=[["الصافي الأساسي",P.s.net,""],["الإضافي ("+r2(P.otH)+" ساعة)",P.op,"+"],["حوافز ("+P.cnt+")",P.inc,"+"],["مكافآت",P.bon,"+"],["خصم التأخير والانصراف المبكر ("+P.lm+" دقيقة)",P.ld,"-"],["خصم الغياب ("+P.ab+" يوم)",P.ad,"-"],["خصومات ثابتة",P.s.d,"-"],["سلف وجزاءات",P.adv,"-"]];
+  var R=[["الصافي الأساسي",P.s.net,""],["الإضافي ("+r2(P.otH)+" ساعة)",P.op,"+"],["حوافز ("+P.cnt+")",P.inc,"+"],["مكافآت",P.bon,"+"],["خصم التأخير والانصراف المبكر ("+hm(P.lm)+")",P.ld,"-"],["خصم الغياب ("+P.ab+" يوم)",P.ad,"-"],["خصومات ثابتة",P.s.d,"-"],["سلف وجزاءات",P.adv,"-"]];
   $("mt").innerHTML=R.map(function(r){return"<tr><td>"+r[0]+'</td><td class="'+(r[1]&&r[2]=="-"?"neg":r[1]&&r[2]=="+"?"pos":"")+'">'+(r[1]&&r[2]?r[2]+" ":"")+money(r[1])+"</td></tr>"}).join("")+"<tr><td><b>المستحق المتوقع</b></td><td><b>"+money(P.tot)+"</b></td></tr>";$("bigtot").textContent=money(P.tot);$("bignow").textContent=money(accr(P,m));heroU();var ev=EV[m+"_"+id],tg=P.s.tb>0&&P.dy!=null?" · التارجت: "+(P.s.tw?P.cnt+"/"+P.s.tw+" شغل ":"")+(P.s.ta?P.dy+"/"+P.s.ta+" يوم ":"")+(P.tg?"✓ اتحقق":""):"";$("evn").textContent=(ev?"تقييمك: "+ev.score+"/10"+(ev.note?" — "+ev.note:""):"")+tg+(P.s.role==="sales"&&P.ach!=null?" · تحقيق التارجت "+Math.round(P.ach)+"% (الحد الأدنى "+P.s.thr+"%)":"");
   var rows=AT.filter(function(a){return a.d.slice(0,7)===m}).sort(function(a,b){return a.d<b.d?1:-1});
-  $("myl").innerHTML=rows.map(function(a){var c=calc(a,P.s);return"<tr><td>"+esc(a.d)+"</td><td>"+esc(a.leave?"إجازة":a.i)+"</td><td>"+esc(a.o||"-")+"</td><td>"+(c.late?c.late+" د":"0")+(c.early>30&&!a.ex?" | مبكر "+c.early+" د":"")+"</td><td>"+(c.ot?r2(c.ot):"0")+"</td></tr>"}).join("")||'<tr><td colspan="5">مفيش تسجيلات</td></tr>';
+  $("myl").innerHTML=rows.map(function(a){var c=calc(a,P.s);return"<tr><td>"+esc(a.d)+"</td><td>"+esc(a.leave?"إجازة":a.i)+"</td><td>"+esc(a.o||"-")+"</td><td>"+(c.late?hm(c.late):"0")+(c.early>30&&!a.ex?" | مبكر "+hm(c.early):"")+"</td><td>"+(c.ot?r2(c.ot):"0")+"</td></tr>"}).join("")||'<tr><td colspan="5">مفيش تسجيلات</td></tr>';
   drawMeX(id,m,P);if(typeof drawEN==="function")drawEN();
   var inM=function(x){return x.d.slice(0,7)===m},F=ADV.filter(function(x){return advPart(x,m)>0}).map(function(x){return{l:x.inst>1?"سلفة (قسط "+(ym(m)-ym(x.d)+1)+"/"+x.inst+")":"سلفة",x:Object.assign({},x,{amount:r2(advPart(x,m))})}}).concat(BON.filter(inM).map(function(x){return{l:"مكافأة",x:x}})).concat(PEN.filter(inM).map(function(x){return{l:"جزاء",x:x}})).sort(function(a,b){return a.x.d<b.x.d?1:-1});
   $("myf").innerHTML=F.map(function(o){return"<tr><td>"+o.l+"</td><td>"+esc(o.x.d)+"</td><td>"+o.x.amount+"</td><td>"+esc(o.x.note)+"</td></tr>"}).join("")||'<tr><td colspan="4">مفيش سلف أو مكافآت</td></tr>';
@@ -400,10 +400,10 @@ function drawAdm(){
 function AUD(act,uid,det){db.collection("audit").add({by:me.email,at:firebase.firestore.FieldValue.serverTimestamp(),act:act,who:uid?((U[uid]||{}).name||""):"",det:det||""}).catch(function(){})}
 function drawAu(){$("aul").innerHTML=AU.map(function(a){var t=a.at&&a.at.toDate?a.at.toDate().toLocaleString("ar-EG",{timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"short"}):"";return"<tr><td>"+esc(t)+'</td><td dir="ltr">'+esc(a.by)+"</td><td><b>"+esc(a.act)+"</b></td><td>"+esc(a.who)+"</td><td>"+esc(a.det)+"</td></tr>"}).join("")||'<tr><td colspan="5">مفيش سجل لسه</td></tr>'}
 function drawAll(){drawE();drawA();drawP();drawF();drawReq();drawAdm();drawBr();drawW();extraAdm();drawHq()}
-function stg(uid){var s=ST[uid]||{};return{net:+s.net||0,h:+s.hours||8,t:s.start||"09:00",d:+s.ded||0,off:s.off==null?5:+s.off,role:s.role||"other",branch:s.branch||"",instv:s.instv||{},maintv:+s.maintv||0,sp:s.sp||{},lb:s.lb==null?21:+s.lb,otm:s.otm==null?2:(+s.otm||2),tw:+s.tw||0,ta:+s.ta||0,tb:+s.tb||0,sv:s.sv||{},st:s.st||{},thr:+s.thr||0,pp:s.pp==null?50:+s.pp}}
+function stg(uid){var s=ST[uid]||{};return{net:+s.net||0,h:+s.hours||8,t:s.start||"09:00",d:+s.ded||0,off:s.off==null?5:+s.off,role:s.role||"other",branch:s.branch||"",instv:s.instv||{},maintv:+s.maintv||0,sp:s.sp||{},lb:s.lb==null?21:+s.lb,otm:s.otm==null?2:(+s.otm||2),tw:+s.tw||0,ta:+s.ta||0,tb:+s.tb||0,sv:s.sv||{},st:s.st||{},thr:+s.thr||0,pp:s.pp==null?50:+s.pp,shd:s.shd||{},mt:s.mt||{}}}
 function earlyFrac(e){return e<=30?0:e<=60?0.25:e<=90?0.5:1}
 function calc(a,s){
-  if(a.leave)return{late:0,early:0,frac:0,w:0,ot:0};
+  if(a.leave)return{late:0,early:0,frac:0,w:0,ot:0};s=sD(s,a.d);
   var late=a.i?Math.max(0,mins(a.i)-mins(s.t)):0,w=0,early=0,end=mins(s.t)+Math.round(s.h*60);
   if(a.i&&a.o){w=(mins(a.o)-mins(a.i))/60;if(w<0)w+=24;if(mins(a.o)>=mins(a.i)&&end<=1440)early=Math.max(0,end-mins(a.o))}
   if(a.d&&(new Date(a.d+"T00:00:00").getDay()===s.off||HOL[a.d]))return{late:0,early:0,frac:0,w:w,ot:w};
@@ -428,7 +428,7 @@ function drawE(){
 function drawA(){mloadR($("ff").value,$("ft2").value);
   var rows=AT.slice().sort(function(a,b){return a.d<b.d?1:-1}).filter(attF);
   $("al").innerHTML=rows.map(function(a){var s=stg(a.uid),c=calc(a,s);
-    return"<tr><td>"+esc(a.d)+"</td><td>"+esc((U[a.uid]||{}).name||a.name)+"</td><td>"+esc(a.leave?"إجازة":a.i)+"</td><td>"+(a.o?esc(a.o):a.leave?"-":(a.d<today()?'<span class="tg or">⚠️ نسي ينصرف</span>':'<span class="tg or">لسه ماانصرفش</span>'))+(a.ex?' <span class="tg bl">بإذن</span>':"")+"</td><td>"+r2(c.w)+"</td><td>"+(c.ot?'<span class="pos">'+r2(c.ot)+"</span>":"0")+"</td><td>"+(c.late?'<span class="neg">'+c.late+" د</span>":"0")+(c.early>30&&!a.ex?' <span class="neg">مبكر '+c.early+" د</span>":"")+'</td><td>'+locTxt(a)+dvTag(a)+'</td><td>'+(!a.o&&!a.leave?'<button class="b s" data-xo="'+a.id+'">انصراف الآن</button> ':"")+'<button class="b s" data-ed="'+a.id+'">تعديل</button> <button class="b s" data-da="'+a.id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="9">لسه مفيش تسجيلات</td></tr>'
+    return"<tr><td>"+esc(a.d)+"</td><td>"+esc((U[a.uid]||{}).name||a.name)+"</td><td>"+esc(a.leave?"إجازة":a.i)+"</td><td>"+(a.o?esc(a.o):a.leave?"-":(a.d<today()?'<span class="tg or">⚠️ نسي ينصرف</span>':'<span class="tg or">لسه ماانصرفش</span>'))+(a.ex?' <span class="tg bl">بإذن</span>':"")+"</td><td>"+r2(c.w)+"</td><td>"+(c.ot?'<span class="pos">'+r2(c.ot)+"</span>":"0")+"</td><td>"+(c.late?'<span class="neg">'+hm(c.late)+"</span>":"0")+(c.early>30&&!a.ex?' <span class="neg">مبكر '+hm(c.early)+"</span>":"")+'</td><td>'+locTxt(a)+dvTag(a)+'</td><td>'+(!a.o&&!a.leave?'<button class="b s" data-xo="'+a.id+'">انصراف الآن</button> ':"")+'<button class="b s" data-ed="'+a.id+'">تعديل</button> <button class="b s" data-da="'+a.id+'">حذف</button></td></tr>'}).join("")||'<tr><td colspan="9">لسه مفيش تسجيلات</td></tr>'
 }
 var PR=[];
 function absDays(id,s,m){
@@ -498,7 +498,7 @@ function approve(rid){
 }
 function slip(id,m){
   var P=payCalc(id,m),u=U[id]||{};
-  var R=[[P.s.f&&P.s.f<1?"الصافي الأساسي (نسبة وتناسب "+Math.round(P.s.f*30)+" يوم من 30)":"الصافي الأساسي",P.s.net],["الإضافي ("+r2(P.otH)+" ساعة × "+P.s.otm+")",P.op],["حوافز ("+P.cnt+" جهاز/صيانة)",P.inc],["مكافآت",P.bon],["خصم التأخير والانصراف المبكر ("+P.lm+" دقيقة)",-P.ld],["الغياب ("+P.ab+" يوم)",-P.ad],["خصومات ثابتة",-P.s.d],["سلف وجزاءات",-P.adv]];
+  var R=[[P.s.f&&P.s.f<1?"الصافي الأساسي (نسبة وتناسب "+Math.round(P.s.f*30)+" يوم من 30)":"الصافي الأساسي",P.s.net],["الإضافي ("+r2(P.otH)+" ساعة × "+P.s.otm+")",P.op],["حوافز ("+P.cnt+" جهاز/صيانة)",P.inc],["مكافآت",P.bon],["خصم التأخير والانصراف المبكر ("+hm(P.lm)+")",-P.ld],["الغياب ("+P.ab+" يوم)",-P.ad],["خصومات ثابتة",-P.s.d],["سلف وجزاءات",-P.adv]];
   return'<div class="slip"><div style="display:flex;align-items:center;gap:12px;border-bottom:2px solid #163b69;padding-bottom:10px;margin-bottom:10px"><img src="'+$("lg").src+'" style="width:64px;height:64px;object-fit:contain"><div><b style="font-size:20px;color:#163b69">توكيلات محمد فكري</b><br><span>لتجارة وتوزيع التكييف</span></div></div><h2>شيت مرتب شهر '+esc(m)+"</h2><p>الموظف: <b>"+esc(u.name)+"</b>"+(ROLES[P.s.role]?" — "+ROLES[P.s.role]:"")+"</p><table>"+R.map(function(r){return"<tr><td>"+r[0]+"</td><td>"+r2(r[1])+"</td></tr>"}).join("")+"<tr><td><b>صافي المستحق</b></td><td><b>"+r2(P.tot)+"</b></td></tr></table><p>توقيع الموظف: ____________ &nbsp;&nbsp;&nbsp; توقيع المحاسب: ____________</p></div>"
 }
 function printSlips(L,m){$("ps").innerHTML=L.map(function(i){return slip(i,m)}).join("");document.body.classList.add("pr");window.print();document.body.classList.remove("pr")}
@@ -642,7 +642,7 @@ $("rp_m").value=today().slice(0,7);$("rp_m").onchange=drawRp;
 function drawRp(){mload($("rp_m").value);var m=$("rp_m").value||today().slice(0,7),T={t:0,i:0,a:0,l:0};
   RPR=ids().map(function(id){var P=payCalc(id,m);T.t+=P.tot;T.i+=P.inc;T.a+=P.ab;T.l+=P.lm;return[U[id].name,AT.filter(function(a){return a.uid===id&&a.d.slice(0,7)===m&&!a.leave}).length,P.ab,P.lm,r2(P.otH),P.cnt,r2(P.inc),r2(P.tot)]}).sort(function(a,b){return b[6]-a[6]});
   var K=function(t,v){return'<div class="c ctr" style="margin:0"><div class="note">'+t+'</div><b style="font-size:20px">'+v+"</b></div>"};
-  $("rp_c").innerHTML=K("إجمالي المرتبات",r2(T.t))+K("إجمالي الحوافز",r2(T.i))+K("أيام الغياب",T.a)+K("دقائق التأخير",T.l);
+  $("rp_c").innerHTML=K("إجمالي المرتبات",r2(T.t))+K("إجمالي الحوافز",r2(T.i))+K("أيام الغياب",T.a)+K("وقت التأخير",hm(T.l));
   $("rp_l").innerHTML=RPR.map(function(r,i){return"<tr><td>"+(i<3&&r[6]>0?["🥇","🥈","🥉"][i]+" ":"")+esc(r[0])+"</td>"+r.slice(1).map(function(v){return"<td>"+v+"</td>"}).join("")+"</tr>"}).join("")||'<tr><td colspan="8">مفيش بيانات</td></tr>';
   var bars=function(t,i,u){var mx=Math.max.apply(null,RPR.map(function(r){return+r[i]||0}).concat(1));return"<b>"+t+"</b>"+RPR.map(function(r){var v=+r[i]||0;return'<div style="display:flex;align-items:center;gap:8px;margin:5px 0;font-size:12px"><span style="width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r[0])+'</span><div style="flex:1;background:var(--bd);border-radius:6px;height:10px"><div style="width:'+v/mx*100+'%;height:10px;border-radius:6px;background:var(--cy)"></div></div><span style="min-width:55px">'+v+u+"</span></div>"}).join("")};$("rp_g").innerHTML=bars("الحوافز",6," ج")+'<div style="height:14px"></div>'+bars("أيام الغياب",2," يوم");
   $("rp_b").style.display=PERM&&PERM.owner?"":"none"}
@@ -652,7 +652,7 @@ $("rp_b").onclick=function(){var C=["users","settings","att","advances","bonuses
 /* تنبيه الغياب */
 document.querySelector(".tabs").insertAdjacentHTML("beforebegin",'<div id="abx" class="c" style="display:none"></div>');
 function drawAb(){var x=$("abx");if(!x||!isAdmin)return;var c=cp(new Date()),d=c.year+"-"+c.month+"-"+c.day,n=mins(c.hour+":"+c.minute),dw=new Date(d+"T00:00:00").getDay();
-  var L=HOL[d]?[]:ids().filter(function(id){var s=stg(id);return s.net&&dw!==s.off&&n>mins(s.t)+30&&(U[id].created||"")<=d&&!AT.some(function(a){return a.uid===id&&a.d===d})}).map(function(id){return esc(U[id].name)});
+  var L=HOL[d]?[]:ids().filter(function(id){var s=sD(stg(id),d);return s.net&&dw!==s.off&&n>mins(s.t)+30&&(U[id].created||"")<=d&&!AT.some(function(a){return a.uid===id&&a.d===d})}).map(function(id){return esc(U[id].name)});
   var td=AT.filter(function(a){return a.d===d&&!a.leave}),lt=td.filter(function(a){return calc(a,stg(a.uid)).late>0}).length,rq=REQ.filter(function(r){return r.status==="pending"}).length,wk=WK.filter(function(w){return w.st==="pending"}).length;
   x.innerHTML='<div class="g" style="grid-template-columns:repeat(auto-fit,minmax(90px,1fr))">'+[["حاضرين",td.length,"pos"],["لسه ماحضروش",L.length,L.length?"neg":""],["متأخرين",lt,lt?"neg":""],["طلبات معلقة",rq,""],["شغل للاعتماد",wk,""]].map(function(k){return'<div class="ctr"><div class="note">'+k[0]+'</div><b class="'+k[2]+'" style="font-size:22px">'+k[1]+"</b></div>"}).join("")+"</div>"+(L.length?'<div class="note" style="margin-top:8px">⚠️ '+L.join("، ")+"</div>":"");
   x.style.display=$("bk").classList.contains("hide")?"":"none"}
@@ -693,7 +693,7 @@ function drawPf(f){var id=pfId;if(!id)return;mload(pfM);var fo=document.activeEl
   var u=U[id]||{},m=pfM,P=payCalc(id,m),s=P.s,ev=EV[m+"_"+id]||{},inM=function(x){return x.uid===id&&x.d.slice(0,7)===m};
   var T=function(r,e){return'<div class="sc"><table style="min-width:0">'+(e?"<thead><tr>"+e.map(function(x){return"<th>"+x+"</th>"}).join("")+"</tr></thead>":"")+"<tbody>"+(r.length?r.map(function(x){return"<tr>"+x.map(function(c){return"<td>"+c+"</td>"}).join("")+"</tr>"}).join(""):'<tr><td colspan="9">مفيش</td></tr>')+"</tbody></table></div>"},B=function(t){return'<div style="margin-top:14px"><b>'+t+"</b></div>"};
   var S=[["الصافي الأساسي",s.net],["إضافي ("+r2(P.otH)+" س × "+s.otm+")",P.op],["حوافز ("+P.cnt+")",P.inc],["مكافآت"+(P.tg?" (منها تارجت "+P.tg+")":""),P.bon],["خصم التأخير والانصراف المبكر",-P.ld],["الغياب ("+P.ab+" يوم)",-P.ad],["خصومات ثابتة",-s.d],["سلف وجزاءات",-P.adv]].map(function(r){return[r[0],money(r[1])]});S.push(["<b>المستحق</b>","<b>"+money(P.tot)+"</b>"]);S.push(["المرتب حتى النهارده",money(accr(P,m))]);
-  var A=AT.filter(inM).sort(function(a,b){return a.d<b.d?1:-1}).map(function(a){var c=calc(a,s);return[esc(a.d),esc(a.leave?"إجازة":a.i),esc(a.o||"-"),(c.late?c.late+" د":"0")+(PM[id+"_"+a.d]?' <span class="tg bl">إذن</span>':a.ex?' <span class="tg bl">بإذن</span>':"")]});
+  var A=AT.filter(inM).sort(function(a,b){return a.d<b.d?1:-1}).map(function(a){var c=calc(a,s);return[esc(a.d),esc(a.leave?"إجازة":a.i),esc(a.o||"-"),(c.late?hm(c.late):"0")+(PM[id+"_"+a.d]?' <span class="tg bl">إذن</span>':a.ex?' <span class="tg bl">بإذن</span>':"")]});
   var F=ADV.filter(function(x){return x.uid===id&&advPart(x,m)>0}).map(function(x){return[x.inst>1?"قسط "+(ym(m)-ym(x.d)+1)+"/"+x.inst:"سلفة",esc(x.d),money(advPart(x,m))]}).concat(BON.filter(inM).map(function(x){return["مكافأة",esc(x.d),money(x.amount)]}),PEN.filter(inM).map(function(x){return["جزاء",esc(x.d),money(x.amount)]}));
   var W=WK.filter(inM).map(function(w){return[esc(w.d),TL[w.type],esc(w.qty),w.st==="pending"?"⏳":w.st==="rejected"?"مرفوض":money(incOf(w,s))]});
   var Q=Object.keys(PM).filter(function(k){return PM[k].uid===id&&PM[k].d.slice(0,7)===m}).map(function(k){return[esc(PM[k].d),PM[k].hrs+" ساعة"]});
@@ -733,6 +733,78 @@ $("adm").insertAdjacentHTML("beforeend",'<div id="a13" class="hide"><div class="
 function drawAc(){var s=$("ac_u");if(!s)return;var o={};CH.forEach(function(m){o[m.uid]=m.name||m.uid});var c=s.value;s.innerHTML=Object.keys(o).map(function(k){return'<option value="'+k+'">'+esc(o[k])+"</option>"}).join("")||"<option value=''>مفيش محادثات</option>";if(c&&o[c])s.value=c;var l=$("ac_l");l.innerHTML=bub(CH.filter(function(m){return m.uid===s.value}),function(m){return m.from!=="emp"});l.scrollTop=l.scrollHeight}
 $("ac_u").onchange=drawAc;
 $("ac_s").onclick=function(){var t=$("ac_t").value.trim(),u=$("ac_u").value,em=me.email.toLowerCase();if(!t||!u)return;db.collection("msgs").add({uid:u,name:(U[u]||{}).name||"",adm:em,from:em,body:t,at:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){$("ac_t").value=""}).catch(function(e){alert("تعذر الإرسال: "+e.message)})};
+
+/* ===== v10: ورديات الأيام + تقرير سنوي + عداد دردشة + تارجت مبيعات + اعتراضات + تقويم + ساعة ودقيقة ===== */
+function hm(n){n=Math.round(+n||0);var h=Math.floor(n/60),m=n%60;return h?h+" ساعة"+(m?" و"+m+" دقيقة":""):m+" دقيقة"}
+function sD(s,d){var x=(s.shd||{})[new Date(d+"T00:00:00").getDay()];return x&&(x.t||x.h)?Object.assign({},s,{t:x.t||s.t,h:+x.h||s.h}):s}
+function printH(h){$("ps").innerHTML=h;document.body.classList.add("pr");window.print();document.body.classList.remove("pr")}
+document.head.insertAdjacentHTML("beforeend",'<style>[data-t=a14]::before{content:"✋"}.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px}.cal div{padding:6px 0;border-radius:8px}.lgd{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;margin-top:8px}.lgd span{padding:2px 8px;border-radius:8px}</style>');
+var OB=[];
+/* عداد رسايل الدردشة */
+function chK(){return"chs_"+(me?me.uid:"")}
+function chBadge(){try{var last=+localStorage.getItem(chK())||0,n=CH.filter(function(m){var t=tm(m);return t<9e15&&t>last&&(isAdmin?m.from==="emp":m.from!=="emp")}).length;
+document.querySelectorAll('[data-e="e7"],[data-t="a13"]').forEach(function(b){if(n)b.setAttribute("data-b",n);else b.removeAttribute("data-b")})}catch(e){}}
+function chSeen(){try{var mx=0;CH.forEach(function(m){var t=tm(m);if(t<9e15&&t>mx)mx=t});localStorage.setItem(chK(),mx)}catch(e){}chBadge()}
+var _oS=openS;openS=function(k,t){_oS(k,t);if(k==="e7"||k==="a13")chSeen()};
+var _dC=drawCh;drawCh=function(){_dC();chBadge();var v=$("e7");if(v&&!v.classList.contains("hide"))chSeen()};
+var _dA=drawAc;drawAc=function(){_dA();chBadge();var v=$("a13");if(v&&!v.classList.contains("hide"))chSeen()};
+var _dE=drawEN;drawEN=function(){_dE();chBadge()};
+/* تارجت مبيعات الشهر */
+function smt(id,m){var t=+(stg(id).mt||{})[m]||0;if(!t)return"";var n=WK.filter(function(w){return w.uid===id&&w.type==="sale"&&w.st==="approved"&&w.d.slice(0,7)===m}).reduce(function(a,w){return a+(+w.qty||0)},0);return"تارجت المبيعات: "+n+"/"+t+" ("+Math.min(999,Math.round(n/t*100))+"%)"}
+/* التقويم الملون */
+function calHTML(id,m){var s=stg(id),y=+m.slice(0,4),k=+m.slice(5,7)-1,fd=new Date(y,k,1).getDay(),n=new Date(y,k+1,0).getDate(),t=today(),st=ST[id]||{},u=U[id]||{},hire=(st.hire||"")>(u.created||"")?st.hire:(u.created||"");
+var C={ok:["rgba(14,143,91,.30)","حضور"],lt:["rgba(245,158,11,.38)","تأخير / انصراف مبكر"],ab:["rgba(198,40,40,.32)","غياب"],lv:["rgba(42,165,211,.38)","إجازة"],hl:["rgba(124,58,237,.30)","إجازة رسمية"],of:["rgba(148,163,184,.32)","إجازة أسبوعية"]};
+var h='<div class="cal">'+DN.map(function(x){return'<div style="font-size:10px;color:var(--mu)">'+x+"</div>"}).join("");
+for(var i=0;i<fd;i++)h+="<div></div>";
+for(var d=1;d<=n;d++){var ds=m+"-"+p2(d),a=AT.filter(function(r){return r.uid===id&&r.d===ds})[0],c="";
+if(a)c=a.leave?"lv":a.i?(calc(a,s).frac>0?"lt":"ok"):"ok";
+else if(HOL[ds])c="hl";else if(new Date(ds+"T00:00:00").getDay()===s.off)c="of";else if(ds<t&&(!hire||ds>=hire))c="ab";
+h+='<div style="'+(c?"background:"+C[c][0]:"")+'">'+d+"</div>"}
+return h+'</div><div class="lgd">'+Object.keys(C).map(function(q){return'<span style="background:'+C[q][0]+'">'+C[q][1]+"</span>"}).join("")+"</div>"}
+/* التقرير السنوي */
+var yrY=today().slice(0,4);
+function yrData(id,y){var cm=today().slice(0,7),R=[],T=[0,0,0,0,0,0,0,0,0],ok=true;
+for(var k=1;k<=12;k++){var m=y+"-"+p2(k);if(m>cm)break;mload(m);if(!mReady(m))ok=false;var P=payCalc(id,m),A=AT.filter(function(a){return a.uid===id&&a.d.slice(0,7)===m}),pr=A.filter(function(a){return!a.leave&&a.i}).length,lv=A.filter(function(a){return a.leave}).length,r=[m,pr,lv,P.ab,P.lm,r2(P.otH),r2(P.inc),r2(P.bon),r2(P.ld+P.ad+P.s.d+P.adv),r2(P.tot)];R.push(r);for(var j=1;j<10;j++)T[j-1]+=+r[j]}
+return{R:R,T:T,ok:ok}}
+function yrTbl(D){var cols=["الشهر","أيام حضور","إجازات","غياب","وقت التأخير","إضافي (س)","حوافز","مكافآت","الخصومات","المستحق"],f=function(r,b){return"<tr>"+r.map(function(v,i){v=i===4?hm(v):v;return"<td>"+(b?"<b>"+v+"</b>":v)+"</td>"}).join("")+"</tr>"};
+return'<div class="sc"><table style="min-width:0"><thead><tr>'+cols.map(function(x){return"<th>"+x+"</th>"}).join("")+"</tr></thead><tbody>"+D.R.map(function(r){return f(r)}).join("")+f(["الإجمالي"].concat(D.T.map(function(v){return r2(v)})),1)+"</tbody></table></div>"}
+function drawYr(){var b=$("yr");if(!b||b.classList.contains("hide")||!pfId)return;if(document.activeElement&&document.activeElement.id==="yr_y")return;var D=yrData(pfId,yrY);
+b.innerHTML='<div class="top"><b>📅 التقرير السنوي — '+esc((U[pfId]||{}).name)+'</b><button class="b s" data-yx="1">إغلاق</button></div><div class="mp"><label style="margin:0">السنة</label><input id="yr_y" type="number" min="2020" max="2100" value="'+yrY+'"><button class="b s" data-yp="1">طباعة</button></div>'+(D.ok?"":'<div class="note">⏳ جاري تحميل بعض الشهور...</div>')+yrTbl(D)}
+$("pf").insertAdjacentHTML("afterend",'<div id="yr" class="c hide"></div>');
+var _eX=extraAdm;extraAdm=function(){_eX();drawYr()};
+/* ملف الموظف: ورديات + تارجت + تقويم */
+var _dP=drawPf;drawPf=function(f){_dP(f);var p=$("pf");if(!pfId||p.classList.contains("hide"))return;var id=pfId,s=stg(id),m=pfM;
+if(!$("pf_x")){var g="";for(var i=0;i<7;i++){var z=s.shd[i]||{};g+='<div><label>'+DN[i]+'</label><input type="time" id="sd_t'+i+'" value="'+(z.t||"")+'"><input type="number" step="0.5" min="0" max="24" id="sd_h'+i+'" placeholder="ساعات" value="'+(z.h||"")+'" style="margin-top:4px"></div>'}
+p.insertAdjacentHTML("beforeend",'<div id="pf_x"><div style="margin-top:14px"><button class="b" data-yo="1">التقرير السنوي</button></div><b style="display:block;margin-top:14px">⏱️ ورديات الأيام</b><div class="g" style="margin-top:8px">'+g+'</div><button class="b" data-sds="1">حفظ الورديات</button><div class="note">سيب اليوم فاضي يمشي على الوردية العادية ('+s.t+' / '+s.h+' ساعة).</div>'+(s.role==="sales"?'<b style="display:block;margin-top:14px">🎯 تارجت مبيعات الشهر</b><div class="g" style="margin-top:8px"><div><label>عدد الأجهزة المطلوبة في '+m+'</label><input type="number" min="0" id="pf_mt" value="'+(s.mt[m]||"")+'"></div></div><button class="b" data-smt="1">حفظ تارجت الشهر</button><div class="note" id="pf_mp"></div>':"")+'<b style="display:block;margin-top:14px">🗓️ تقويم الشهر</b><div id="pf_cal"></div></div>')}
+$("pf_cal").innerHTML=calHTML(id,m);var mp=$("pf_mp");if(mp)mp.textContent=smt(id,m)};
+/* شاشة الموظف: تقويم + اعتراضات + تارجت */
+var _bE=buildEmp;buildEmp=function(){_bE();if($("e2")&&!$("cal_e"))$("e2").insertAdjacentHTML("beforeend",'<div class="c" id="cal_e"></div><div class="c" id="ob_c"><b>✋ اعتراض على الحضور</b><div class="g" style="margin-top:8px"><div><label>اليوم</label><input type="date" id="ob_d"></div><div style="grid-column:1/-1"><label>سبب الاعتراض</label><input id="ob_n" maxlength="300"></div></div><button class="b" data-obs="1">إرسال الاعتراض</button><div class="sc"><table style="min-width:0"><thead><tr><th>اليوم</th><th>السبب</th><th>الحالة</th></tr></thead><tbody id="ob_l"></tbody></table></div></div>')};
+var _dm=drawMe;drawMe=function(){_dm();try{var m=$("mm").value||today().slice(0,7),c=$("cal_e");if(c)c.innerHTML="<b>🗓️ تقويم الشهر</b>"+calHTML(me.uid,m);var t=smt(me.uid,m);if(t)$("evn").textContent+=" · "+t;drawOb()}catch(e){}};
+function drawOb(){var l=$("ob_l");if(!l)return;l.innerHTML=OB.slice().sort(function(a,b){return tm(b)-tm(a)}).map(function(o){return"<tr><td>"+esc(o.d)+"</td><td>"+esc(o.note)+"</td><td>"+(o.status==="pending"?"قيد المراجعة":o.status==="approved"?"مقبول":"مرفوض")+(o.reply?'<div class="note">'+esc(o.reply)+"</div>":"")+"</td></tr>"}).join("")||'<tr><td colspan="3">مفيش اعتراضات</td></tr>'}
+function obSnap(q,f){unsubs.push(q.onSnapshot(function(s){OB=s.docs.map(function(d){var x=d.data({serverTimestamps:"estimate"});x.id=d.id;return x});f()},NO))}
+var _eE=empExtra;empExtra=function(id){_eE(id);obSnap(db.collection("objections").where("uid","==",id),drawOb)};
+/* أدمن: سجل الاعتراضات */
+document.querySelector(".tabs").insertAdjacentHTML("beforeend",'<button data-t="a14">الاعتراضات</button>');
+$("adm").insertAdjacentHTML("beforeend",'<div id="a14" class="c sc hide"><b>✋ سجل اعتراضات الحضور</b><table><thead><tr><th>الموظف</th><th>اليوم</th><th>السبب</th><th>الحالة</th><th></th></tr></thead><tbody id="ob_al"></tbody></table><div class="note">القبول بيبلغ الموظف، وتعديل الحضور نفسه من تاب الحضور.</div></div>');
+AS.push("a14");
+function drawObA(){var l=$("ob_al");if(!l)return;var pn=OB.filter(function(o){return o.status==="pending"}).length,tb=document.querySelector('.tabs [data-t="a14"]');if(tb){if(pn)tb.setAttribute("data-b",pn);else tb.removeAttribute("data-b")}
+l.innerHTML=OB.slice().sort(function(a,b){return(a.status==="pending"?0:1)-(b.status==="pending"?0:1)||tm(b)-tm(a)}).map(function(o){return"<tr><td>"+esc(o.name)+"</td><td>"+esc(o.d)+"</td><td>"+esc(o.note)+"</td><td>"+(o.status==="pending"?"قيد المراجعة":o.status==="approved"?"✅ مقبول":"✖️ مرفوض")+(o.reply?'<div class="note">'+esc(o.reply)+"</div>":"")+"</td><td>"+(o.status==="pending"?'<button class="b s" data-oa="'+o.id+'">قبول</button> <button class="b s" data-orj="'+o.id+'">رفض</button>':"")+"</td></tr>"}).join("")||'<tr><td colspan="5">مفيش اعتراضات</td></tr>'}
+var _aE=admExtra;admExtra=function(){_aE();if(PERM.att)obSnap(db.collection("objections"),drawObA)};
+/* أحداث الأزرار */
+document.addEventListener("change",function(e){if(e.target.id==="yr_y"){yrY=e.target.value||yrY;drawYr()}});
+document.addEventListener("click",function(ev){var b=ev.target.closest&&ev.target.closest("button");if(!b)return;var x=b.dataset;
+if(x.yo){$("yr").classList.remove("hide");drawYr();$("yr").scrollIntoView({behavior:"smooth"})}
+if(x.yx||x.pfx)$("yr").classList.add("hide");
+if(x.yp){var u=U[pfId]||{};printH('<div class="slip"><h3 style="margin:0 0 6px">توكيلات محمد فكري — التقرير السنوي '+esc(yrY)+"</h3><div>الموظف: "+esc(u.name)+"</div>"+yrTbl(yrData(pfId,yrY))+"</div>")}
+if(x.sds){var id=pfId,o={};for(var i=0;i<7;i++){var t=$("sd_t"+i).value,h=+$("sd_h"+i).value;if(t||h>0){o[i]={};if(t)o[i].t=t;if(h>0)o[i].h=h}}
+db.collection("settings").doc(id).set({shd:o},{mergeFields:["shd"]}).then(function(){AUD("تعديل ورديات الأيام",id,JSON.stringify(o));alert("اتحفظت الورديات")}).catch(function(e){alert("تعذر الحفظ: "+e.message)})}
+if(x.smt){var i2=pfId,o2={};o2[pfM]=+$("pf_mt").value||0;db.collection("settings").doc(i2).set({mt:o2},{merge:true}).then(function(){AUD("تعديل تارجت مبيعات الشهر",i2,pfM+" | "+o2[pfM])}).catch(function(e){alert("تعذر الحفظ: "+e.message)})}
+if(x.obs){var d=$("ob_d").value,n=$("ob_n").value.trim();if(!d||!n)return alert("اختار اليوم واكتب سبب الاعتراض");b.disabled=true;
+db.collection("objections").add({uid:me.uid,name:(U[me.uid]||{}).name||me.email,d:d,note:n,status:"pending",at:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){$("ob_n").value="";alert("اتبعت اعتراضك للإدارة")}).catch(function(e){alert("تعذر الإرسال: "+e.message)}).then(function(){b.disabled=false})}
+if(x.oa||x.orj){var ok=!!x.oa,oid=x.oa||x.orj,o3=OB.filter(function(q){return q.id===oid})[0]||{},r=prompt("رد على الموظف (اختياري)")||"";
+db.collection("objections").doc(oid).update({status:ok?"approved":"rejected",reply:r,by:me.email}).then(function(){AUD(ok?"قبول اعتراض حضور":"رفض اعتراض حضور",o3.uid,o3.d);notify(o3.uid,ok?"✅ تم قبول اعتراضك":"✖️ تم رفض اعتراضك","يوم "+o3.d+(r?" — "+r:""))}).catch(function(e){alert("تعذر التنفيذ: "+e.message)})}
+});
+
 }
 </script>
 </body>
