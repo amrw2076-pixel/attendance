@@ -221,7 +221,7 @@ if(FB_CONFIG.apiKey==="PUT_HERE"){document.body.innerHTML='<div class="w"><div c
 else{
 firebase.initializeApp(FB_CONFIG);
 var auth=firebase.auth(),db=firebase.firestore();
-var me=null,isAdmin=false,unsubs=[],U={},ST={},AT=[],ADV=[],BON=[],REQ=[],ADMS=[],PERM=null,signup=false,BR={},WK=[],wgRole=null,AU=[];
+var SUP=false,me=null,isAdmin=false,unsubs=[],U={},ST={},AT=[],ADV=[],BON=[],REQ=[],ADMS=[],PERM=null,signup=false,BR={},WK=[],wgRole=null,AU=[];
 
 var PH_DOM="@phone.local";
 function toEmail(v){v=String(v||"").trim();if(v.indexOf("@")>0)return v.toLowerCase();
@@ -235,7 +235,13 @@ $("go").onclick=function(){
   if(!e)return $("ae").textContent="اكتب رقم موبايل صحيح (11 رقم يبدأ بـ 01)";
   if(signup){
     if(!n)return $("ae").textContent="اكتب اسمك";
-    auth.createUserWithEmailAndPassword(e,p).then(function(c){return db.collection("users").doc(c.user.uid).set({name:n,email:e,phone:e.slice(-PH_DOM.length)===PH_DOM?disp(e):"",created:today()})}).catch(showErr)
+    var ph=e.slice(-PH_DOM.length)===PH_DOM?disp(e):"";SUP=true;
+    auth.createUserWithEmailAndPassword(e,p).then(function(c){return db.collection("users").doc(c.user.uid).set({name:n,email:e,phone:ph,created:today()})}).catch(function(x){
+      if(x.code!=="auth/email-already-in-use")return showErr(x);
+      /* الرقم له حساب قديم (ممكن يكون اتحذف): ندخل بالباسورد، ولو محذوف نبعت طلب للإدارة */
+      return auth.signInWithEmailAndPassword(e,p).then(function(c){var r=db.collection("users").doc(c.user.uid);return r.get().then(function(d){if(!d.exists||d.data().deleted)return r.set({name:n,email:e,phone:ph,created:today(),pending:true,reqAt:firebase.firestore.FieldValue.serverTimestamp()})})}).catch(function(y){
+        if(y.code==="auth/invalid-credential"||y.code==="auth/wrong-password")$("ae").textContent="الرقم ده مسجل قبل كده بباسورد تانى. اكتب الباسورد القديم بتاعه، أو كلّم الإدارة";else showErr(y)})
+    }).then(function(){SUP=false})
   }else auth.signInWithEmailAndPassword(e,p).catch(showErr)
 };
 function showErr(x){var m={"auth/email-already-in-use":"رقم الموبايل ده مسجل قبل كده","auth/invalid-credential":"رقم الموبايل أو الباسورد غلط","auth/weak-password":"الباسورد ضعيف (6 حروف على الأقل)","auth/invalid-email":"رقم الموبايل مش مظبوط","auth/user-not-found":"مفيش حساب بالرقم ده","auth/wrong-password":"الباسورد غلط"};$("ae").textContent=m[x.code]||("حصل خطأ: "+x.message)}
@@ -244,7 +250,7 @@ $("out").onclick=function(){auth.signOut()};
 (function(){var l=document.createElement("link");l.rel="icon";l.href=$("lg").src;document.head.appendChild(l)})();
 
 auth.onAuthStateChanged(function(u){
-  document.body.classList.remove("isemp");MODE="";TD=null;EF=0;PM={};EV={};DVS={};UL=0;MS={};MD={};MC={};LV=[];MQ=null;unsubs.forEach(function(f){f()});unsubs=[];me=u;U={};ST={};AT=[];ADV=[];BON=[];REQ=[];ADMS=[];PERM=null;BR={};WK=[];wgRole=null;AN=[];RD={};RA=[];HOL={};AN1={};AN2={};CL={};PS={};PEN=[];
+  document.body.classList.remove("isemp","gated");MODE="";TD=null;EF=0;PM={};EV={};DVS={};UL=0;MS={};MD={};MC={};LV=[];MQ=null;unsubs.forEach(function(f){f()});unsubs=[];me=u;U={};ST={};AT=[];ADV=[];BON=[];REQ=[];ADMS=[];PERM=null;BR={};WK=[];wgRole=null;AN=[];RD={};RA=[];HOL={};AN1={};AN2={};CL={};PS={};PEN=[];
   $("auth").classList.toggle("hide",!!u);$("app").classList.toggle("hide",!u);
   if(!u)return;
   var own=(u.email||"").toLowerCase()===ADMIN_EMAIL.toLowerCase();
@@ -417,7 +423,7 @@ function calc(a,s){
   var pm=PM[a.uid+"_"+a.d];if(pm&&pm.pos){var al=Math.round((+pm.hrs||0)*60);if(pm.pos==="start")late=Math.max(0,late-al);else early=Math.max(0,early-al)}return{late:late,early:early,frac:(a.ex||(pm&&!pm.pos))?0:Math.min(1,lateFrac(late)+earlyFrac(early)),w:w,ot:Math.max(0,w-s.h)}
 }
 function rs(){PM={};EV={};DVS={};UL=0;MS={};MD={};MC={};LV=[];MQ=null;TD=null;EF=0;unsubs.forEach(function(f){f()});unsubs=[];U={};ST={};AT=[];ADV=[];BON=[];REQ=[];ADMS=[];BR={};WK=[];wgRole=null;AN=[];RD={};RA=[];HOL={};AN1={};AN2={};CL={};PS={};PEN=[]}
-function ids(){var m={};ADMS.forEach(function(a){m[a.id]=a});var pe=ADMIN_EMAIL.toLowerCase();return Object.keys(U).filter(function(i){var e=(U[i].email||"").toLowerCase(),a=m[e];if(e===pe)return !!(a&&a.emp);return a?!!a.emp:true})}
+function ids(){var m={};ADMS.forEach(function(a){m[a.id]=a});var pe=ADMIN_EMAIL.toLowerCase();return Object.keys(U).filter(function(i){if(U[i].deleted||U[i].pending)return false;var e=(U[i].email||"").toLowerCase(),a=m[e];if(e===pe)return !!(a&&a.emp);return a?!!a.emp:true})}
 var DN=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
 function ymd(d){return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
 function drawE(){
@@ -713,7 +719,7 @@ function drawPf(f){var id=pfId;if(!id)return;mload(pfM);var fo=document.activeEl
   $("pf_m").onchange=function(){pfM=this.value||pfM;drawPf(1)}}
 document.addEventListener("click",function(ev){var b=ev.target.closest&&ev.target.closest("button");if(!b)return;var x=b.dataset;
   if(x.dvr){var i3=pfId;db.collection("devices").doc(i3).delete().then(function(){delete DVS[i3];AUD("فك ربط جهاز",i3,"");drawPf(1)}).catch(function(e){alert("تعذر التنفيذ: "+e.message)})}
-  if(x.stl)stl(pfId);if(x.ud){var u9=pfId;AUD("حذف موظف",u9,"");Promise.all([db.collection("users").doc(u9).delete(),db.collection("settings").doc(u9).delete().catch(NO),db.collection("devices").doc(u9).delete().catch(NO)]).then(function(){pfId=null;$("pf").classList.add("hide")}).catch(function(e){alert("تعذر الحذف: "+e.message)})}
+  if(x.stl)stl(pfId);if(x.ud){var u9=pfId;AUD("حذف موظف",u9,"");var uo=U[u9]||{};Promise.all([db.collection("users").doc(u9).set({deleted:true,pending:false,name:uo.name||"",email:uo.email||"",phone:uo.phone||"",delAt:today()}),db.collection("settings").doc(u9).delete().catch(NO),db.collection("devices").doc(u9).delete().catch(NO)]).then(function(){pfId=null;$("pf").classList.add("hide")}).catch(function(e){alert("تعذر الحذف: "+e.message)})}
   if(x.pf)openPf(x.pf);if(x.pfx){pfId=null;$("pf").classList.add("hide")}
   if(x.sev){var sc=+$("pf_sc").value,nt=$("pf_nt").value.trim(),id=pfId,d={uid:id,name:(U[id]||{}).name||"",m:pfM,score:sc,note:nt};db.collection("evals").doc(pfM+"_"+id).set(d).then(function(){EV[pfM+"_"+id]=d;AUD("تقييم شهري",id,pfM+" | "+sc+"/10");notify(id,"⭐ تقييم شهر "+pfM,sc+"/10"+(nt?" — "+nt:""))}).catch(function(e){alert("تعذر الحفظ: "+e.message)})}
   if(x.stg){var id2=pfId,t={tw:+$("pf_tw").value||0,ta:+$("pf_ta").value||0,tb:+$("pf_tb").value||0};db.collection("settings").doc(id2).set(t,{merge:true}).then(function(){AUD("تعديل تارجت",id2,"شغل "+t.tw+" | أيام "+t.ta+" | مكافأة "+t.tb)}).catch(function(e){alert("تعذر الحفظ: "+e.message)})}
@@ -837,6 +843,50 @@ if(t==="leave"){if(!v("lv_1"))return alert("اختار تاريخ بداية ا�
 if(t==="advance"){var a=+v("ad_a"),net=stg(id).net;if(!(a>0))return alert("اكتب مبلغ السلفة");if(net&&a>net/2)return alert("الحد الأقصى للسلفة نص المرتب ("+net/2+" ج)");o.amount=a;o.inst=Math.min(12,Math.max(1,Math.floor(+v("ad_i")||1)));o.note=v("ad_n").trim()}
 if(t==="perm"){var h=+v("pm_h");if(!v("pm_d")||!(h>0&&h<=8))return alert("اختار يوم الإذن وعدد الساعات (لحد 8)");o.d1=o.d2=v("pm_d");o.hrs=h;o.pos=v("pm_p");o.note=v("pm_n").trim()}
 b.disabled=true;db.collection("requests").add(o).then(function(){["lv_1","lv_2","lv_n","ad_a","ad_n","pm_d","pm_h","pm_n"].forEach(function(i){$(i).value=""});alert("اتبعت الطلب للإدارة")}).catch(function(e){alert("تعذر الإرسال: "+e.message)}).then(function(){b.disabled=false})});
+/* ===== v13: حذف نهائي + طلب إعادة تفعيل + ربط الحساب بأول جهاز ===== */
+document.head.insertAdjacentHTML("beforeend",'<style>body.gated #emp,body.gated #bn{display:none!important}#gt{display:none;max-width:460px;margin:18px auto}body.gated #gt{display:block}</style>');
+$("emp").insertAdjacentHTML("afterend",'<div id="gt" class="c ctr"></div>');
+var DR=[];
+function gateInit(id){
+  var G={u:undefined,d:undefined,r:undefined},bound=false;
+  function show(h){document.body.classList.toggle("gated",!!h);$("gt").innerHTML=h||""}
+  function ev(){
+    if(G.u===undefined||G.d===undefined||G.r===undefined)return;
+    var u=G.u;if(!u&&SUP)return;
+    if(!u||u.deleted)return show('<h3>🚫 الحساب ده اتحذف من النظام</h3><div class="note">لو عاوز ترجع تشتغل، ابعت طلب للإدارة وانتظر موافقتها.</div><div style="max-width:300px;margin:12px auto"><label>اسمك</label><input id="gt_n" value="'+esc(u&&u.name||"")+'"></div><button class="b" data-gr="1">📤 طلب إعادة تفعيل</button>');
+    if(u.pending)return show('<h3>⏳ طلبك بانتظار موافقة الإدارة</h3><div class="note">هتقدر تدخل على السيستم أول ما الإدارة تقبل. افتح الموقع تاني بعد شوية.</div>');
+    if(G.d&&G.d.id!==DV()){var r=G.r;
+      return show('<h3>📱 حسابك مربوط بجهاز تاني</h3>'+(r&&r.status==="pending"?'<div class="note">طلب تغيير الجهاز اتبعت وبانتظار موافقة الإدارة. افتح الموقع تاني بعد ما يتقبل.</div>':(r&&r.status==="rejected"?'<div class="note neg">الإدارة رفضت الطلب السابق.</div>':'<div class="note">مينفعش تدخل من جهاز غير اللي اتسجل منه أول مرة.</div>')+'<button class="b" data-gd="1">📤 طلب استخدام الجهاز ده</button>'))}
+    show("");
+    if(!G.d&&!bound){bound=true;db.collection("devices").doc(id).set({id:DV(),at:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){bound=false})}
+  }
+  unsubs.push(db.collection("users").doc(id).onSnapshot(function(d){G.u=d.exists?d.data():null;ev()},NO));
+  unsubs.push(db.collection("devices").doc(id).onSnapshot(function(d){G.d=d.exists?d.data():null;ev()},NO));
+  unsubs.push(db.collection("devreqs").doc(id).onSnapshot(function(d){G.r=d.exists?d.data():null;ev()},function(){G.r=null;ev()}));
+}
+var _eE3=empExtra;empExtra=function(id){_eE3(id);gateInit(id)};
+/* أدمن: طلبات الحسابات والأجهزة */
+$("a1").insertAdjacentHTML("afterbegin",'<div id="apv" class="c hide"></div>');
+function drawApv(){var x=$("apv");if(!x)return;var ok=PERM&&PERM.edit,P=ok?Object.keys(U).filter(function(i){return U[i].pending}):[],D=ok?DR.filter(function(r){return r.status==="pending"}):[],n=P.length+D.length,tb=document.querySelector('.tabs [data-t="a1"]');
+  if(tb){if(n)tb.setAttribute("data-b",n);else tb.removeAttribute("data-b")}
+  x.classList.toggle("hide",!n);if(!n){x.innerHTML="";return}
+  var row=function(t,a,r){return'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)"><span>'+t+'</span><span><button class="b s" data-'+a+'>قبول</button> <button class="b s" data-'+r+'>رفض</button></span></div>'};
+  x.innerHTML='<b>🔔 طلبات محتاجة موافقتك</b>'+
+   (P.length?'<div class="note" style="margin-top:8px">طلبات إعادة تفعيل حسابات اتحذفت</div>'+P.map(function(i){return row(esc(U[i].name)+" — "+esc(disp(U[i].email)),'apu="'+i+'"','rju="'+i+'"')}).join(""):"")+
+   (D.length?'<div class="note" style="margin-top:12px">طلبات تغيير الجهاز</div>'+D.map(function(r){return row(esc(r.name)+" — جهاز جديد",'apd="'+r.id+'"','rjd="'+r.id+'"')}).join(""):"")}
+var _eX2=extraAdm;extraAdm=function(){_eX2();drawApv()};
+var _aE2=admExtra;admExtra=function(){_aE2();document.body.classList.remove("gated");if(PERM.edit)unsubs.push(db.collection("devreqs").onSnapshot(function(s){DR=s.docs.map(function(d){var x=d.data();x.id=d.id;return x});drawApv()},NO))};
+document.addEventListener("click",function(ev){var b=ev.target.closest&&ev.target.closest("button");if(!b||!me)return;var x=b.dataset,id=me.uid,ts=firebase.firestore.FieldValue.serverTimestamp(),er=function(e){alert("تعذر التنفيذ: "+e.message)};
+  if(x.gr){var n=($("gt_n").value||"").trim();if(!n)return alert("اكتب اسمك");b.disabled=true;
+    db.collection("users").doc(id).set({name:n,email:me.email,phone:me.email.slice(-PH_DOM.length)===PH_DOM?disp(me.email):"",created:today(),pending:true,reqAt:ts}).catch(er).then(function(){b.disabled=false})}
+  if(x.gd){b.disabled=true;db.collection("devreqs").doc(id).set({uid:id,name:(U[id]||{}).name||me.email,dv:DV(),status:"pending",at:ts}).catch(er).then(function(){b.disabled=false})}
+  if(x.apu||x.rju){var ok=!!x.apu,i=x.apu||x.rju;
+    db.collection("users").doc(i).update(ok?{pending:false,deleted:false}:{pending:false,deleted:true}).then(function(){AUD(ok?"قبول إعادة تفعيل حساب":"رفض إعادة تفعيل حساب",i,"");if(ok)notify(i,"✅ تم تفعيل حسابك","تقدر تدخل على السيستم دلوقتي")}).catch(er)}
+  if(x.apd){var r=DR.filter(function(q){return q.id===x.apd})[0];if(!r)return;var bt=db.batch();
+    bt.set(db.collection("devices").doc(r.uid),{id:r.dv,at:ts});bt.delete(db.collection("devreqs").doc(r.uid));
+    bt.commit().then(function(){AUD("قبول تغيير جهاز",r.uid,"")}).catch(er)}
+  if(x.rjd)db.collection("devreqs").doc(x.rjd).update({status:"rejected"}).then(function(){AUD("رفض تغيير جهاز",x.rjd,"")}).catch(er)
+});
 
 }
 </script>
