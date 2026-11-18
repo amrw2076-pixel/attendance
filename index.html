@@ -220,7 +220,7 @@ function sumA(L,id,m){return L.filter(function(x){return x.uid===id}).reduce(fun
 if(FB_CONFIG.apiKey==="PUT_HERE"){document.body.innerHTML='<div class="w"><div class="c">لسه ماحطيتش إعدادات Firebase في أول الملف. اتبع خطوات الإعداد.</div></div>'}
 else{
 firebase.initializeApp(FB_CONFIG);
-var auth=firebase.auth(),db=firebase.firestore();db.enablePersistence({synchronizeTabs:true}).catch(function(){});
+var auth=firebase.auth(),db=firebase.firestore();db.enablePersistence().catch(function(e){console.warn("offline cache:",e.code)});
 var SUP=false,me=null,isAdmin=false,unsubs=[],U={},ST={},AT=[],ADV=[],BON=[],REQ=[],ADMS=[],PERM=null,signup=false,BR={},WK=[],wgRole=null,AU=[];
 
 var PH_DOM="@phone.local";
@@ -730,7 +730,7 @@ function mkHero(pb){var h=document.createElement("div");h.id="hero";h.className=
 ["mm","pm","rp_m","wm"].forEach(function(i){var e=$(i),w=document.createElement("div");w.className="mp";e.parentNode.insertBefore(w,e);
   var mv=function(k){return function(){var a=e.value||today().slice(0,7),d=new Date(+a.slice(0,4),+a.slice(5,7)-1+k,1);e.value=d.getFullYear()+"-"+p2(d.getMonth()+1);if(e.onchange)e.onchange()}},p=document.createElement("button"),n=document.createElement("button");
   p.className=n.className="b s";p.textContent="▶";n.textContent="◀";p.title="الشهر السابق";n.title="الشهر التالي";p.onclick=mv(-1);n.onclick=mv(1);w.appendChild(p);w.appendChild(e);w.appendChild(n)});
-var ob=document.createElement("div");ob.id="off";ob.textContent="أنت أوفلاين، اتأكد من النت قبل التسجيل";document.body.appendChild(ob);
+var ob=document.createElement("div");ob.id="off";ob.textContent="أنت أوفلاين: التسجيل هيتحفظ على جهازك ويتبعت لما النت يرجع";document.body.appendChild(ob);
 function ou(){ob.style.display=navigator.onLine?"none":"block"}addEventListener("online",ou);addEventListener("offline",ou);ou();
 /* ===== v8: ملف الموظف + تقييم + تارجت + إذن بالساعات ===== */
 $("a1").insertAdjacentHTML("afterbegin",'<div id="pf" class="c hide"></div>');
@@ -996,9 +996,9 @@ function drawX(){if(!$("fx_l")||isAdmin||!me)return;var id=me.uid,m=today().slic
  $("fx_l").innerHTML=FX.slice().sort(function(a,b){return tm(b)-tm(a)}).map(function(r){return"<tr><td>"+esc(r.d)+"</td><td>"+esc((r.i||"-")+" / "+(r.o||"-"))+"</td><td>"+stN(r.status)+"</td></tr>"}).join("")||'<tr><td colspan="3">لا يوجد</td></tr>';
  $("v_k").style.display=dr?"":"none";$("v_t").textContent=dr?"🚗 مشوار جديد":"📍 زيارة جديدة";$("v_pl").textContent=dr?"الوجهة":"العميل";
  $("v_l").innerHTML=VS.slice().sort(function(a,b){return tm(b)-tm(a)}).slice(0,30).map(function(v){return"<tr><td>"+esc(v.d)+"</td><td>"+esc(v.p)+"</td><td>"+esc(v.res||"")+"</td><td>"+(v.kind==="trip"?(+v.k1>0?v.k1-v.k0:"-"):"")+"</td></tr>"}).join("")||'<tr><td colspan="4">لا يوجد</td></tr>';
- $("sc_i").innerHTML="رصيد الإجازات: <b>"+rem+"</b> يوم متبقي من "+s.lb+(SH[id]?"<div>الوردية الأسبوع ده: <b>"+shName(shCode(id,today()))+"</b> · الأسبوع الجاي: <b>"+shName(shCode(id,d1))+"</b></div>":"")+(n>=THR?'<div class="err">⚠️ إنذار: اتأخرت '+n+" مرات الشهر ده</div>":"")}
+ $("sc_i").innerHTML=(SH[id]?"<div>الوردية الأسبوع ده: <b>"+shName(shCode(id,today()))+"</b> · الأسبوع الجاي: <b>"+shName(shCode(id,d1))+"</b></div>":"")+(n>=THR?'<div class="err">⚠️ إنذار: اتأخرت '+n+" مرات الشهر ده</div>":"")}
 var _dM4=drawMe;drawMe=function(){_dM4();try{drawX()}catch(e){}};
-document.addEventListener("click",function(ev){var b=ev.target.closest&&ev.target.closest('button[data-rq="leave"]');if(!b||isAdmin||!$("lv_1").value)return;var a=$("lv_1").value,z=$("lv_2").value||a,n=Math.round((new Date(z+"T00:00:00")-new Date(a+"T00:00:00"))/864e5)+1,rem=stg(me.uid).lb-lvUsed(me.uid);if(n>rem){ev.stopImmediatePropagation();alert("رصيد إجازاتك المتبقي "+Math.max(0,rem)+" يوم، والطلب "+n+" يوم")}},true);
+document.addEventListener("click",function(ev){var b=ev.target.closest&&ev.target.closest('button[data-rq="leave"]');if(!b||isAdmin||!$("lv_1").value)return;var a=$("lv_1").value,z=$("lv_2").value||a,n=Math.round((new Date(z+"T00:00:00")-new Date(a+"T00:00:00"))/864e5)+1,rem=stg(me.uid).lb-lvUsed(me.uid);if(n>rem){ev.stopImmediatePropagation();alert("عدد الأيام المطلوبة أكبر من رصيد إجازاتك، كلّم الإدارة")}},true);
 var _eE4=empExtra;empExtra=function(id){SH={};_eE4(id);snapL(db.collection("fixreqs").where("uid","==",id),function(a){FX=a;drawX()});snapL(db.collection("visits").where("uid","==",id),function(a){VS=a;drawX()});unsubs.push(db.collection("shifts").doc(id).onSnapshot(function(d){SH={};if(d.exists)SH[id]=d.data();drawMe()},NO))};
 /* --- الأدمن --- */
 ["a15","a16","a17","a18","a19"].forEach(function(k){AS.push(k)});
