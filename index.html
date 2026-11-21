@@ -97,7 +97,7 @@ body.isemp #bn{display:flex}body.isemp{padding-bottom:84px}body.isemp #bkb{displ
 <div class="w">
 
 <!-- ========= إعدادات: غيّرها قبل الرفع ========= -->
-<script>
+<script>(function(){function sh(m){var d=document.getElementById("dbgx");if(!d){d=document.createElement("div");d.id="dbgx";d.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99999;background:#7f1d1d;color:#fff;font:12px/1.5 monospace;padding:8px;direction:ltr;white-space:pre-wrap;max-height:40vh;overflow:auto";d.onclick=function(){d.remove()};document.body.appendChild(d)}d.textContent+=m+"\n"}addEventListener("error",function(e){sh("ERR: "+e.message+" @"+(e.lineno||"")+":"+(e.colno||""))});addEventListener("unhandledrejection",function(e){sh("REJ: "+(e.reason&&(e.reason.message||e.reason)))})})()</script><script>
 var FB_CONFIG = {
   apiKey: "AIzaSyBsxM32hJTj3MW6iFAeegUnEt2zqJJksO8",
   authDomain: "ac-attendance-f3667.firebaseapp.com",
@@ -1021,7 +1021,7 @@ function drawMap(){var m=$("mp_m").value||today().slice(0,7);mload(m);
  if(window.L)go();else{var s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js";s.onload=go;s.onerror=function(){alert("تعذر تحميل الخريطة، اتأكد من النت")};document.head.appendChild(s)}}
 function drawKp(){if(!PERM||!PERM.pay)return;var m=$("kp_m").value||today().slice(0,7);mload(m);var L2=ids(),T=0,P0=0,A0=0,R=L2.map(function(id){var P=payCalc(id,m),pr=AT.filter(function(a){return a.uid===id&&a.d.slice(0,7)===m&&!a.leave}).length;T+=P.tot;P0+=pr;A0+=P.ab;return{n:U[id].name,c:lateCnt(id,m),l:P.lm,pr:pr}}).sort(function(a,b){return b.c-a.c}),lt=R.reduce(function(t,r){return t+r.c},0),K=function(t,v){return'<div class="c ctr" style="margin:0"><div class="note">'+t+'</div><b style="font-size:20px">'+v+"</b></div>"};
  $("kp_c").innerHTML=K("إجمالي المرتبات",money(r2(T)))+K("نسبة الغياب",(P0+A0?Math.round(A0/(P0+A0)*100):0)+"%")+K("نسبة التأخير",(P0?Math.round(lt/P0*100):0)+"%")+K("إنذارات",R.filter(function(r){return r.c>=THR}).length);
- $("kp_l").innerHTML=R.map(function(r,i){return"<tr><td>"+(i<3&&r.c>0?"🔻 ":"")+esc(r.n)+"</td><td>"+r.c+"</td><td>"+hm(r.l)+"</td><td>"+(r.c>=THR?"⚠️":"")+"</td></tr>"}).join("")||'<tr><td colspan="4">لا يوجد</td></tr>';
+ $("kp_l").innerHTML=R.map(function(r,i){return"<tr><td>"+(i<3&&r.c>0?"🔻 ":"")+esc(r.n)+"</td><td>"+r.c+"</td><td>"+Math.round(r.l)+" د"+"</td><td>"+(r.c>=THR?"⚠️":"")+"</td></tr>"}).join("")||'<tr><td colspan="4">لا يوجد</td></tr>';
  var e=document.querySelector('.tabs [data-t="a19"]');if(e){var w=R.filter(function(r){return r.c>=THR}).length;if(w)e.setAttribute("data-b",w);else e.removeAttribute("data-b")}}
 function drawFxA(){var P=FXA.filter(function(r){return r.status==="pending"}).length,e=document.querySelector('.tabs [data-t="a15"]');if(e){if(P)e.setAttribute("data-b",P);else e.removeAttribute("data-b")}
  $("fxa_l").innerHTML=FXA.map(function(r){return"<tr><td>"+esc(r.name)+"</td><td>"+esc(r.d)+"</td><td>"+esc(r.i||"-")+"</td><td>"+esc(r.o||"-")+"</td><td>"+esc(r.reason)+"</td><td>"+stN(r.status)+(r.reply?'<div class="note">'+esc(r.reply)+"</div>":"")+"</td><td>"+(r.status==="pending"?'<button class="b" data-fxa="'+r.id+'">قبول</button> <button class="b s" data-fxr="'+r.id+'">رفض</button>':"")+"</td></tr>"}).join("")||'<tr><td colspan="7">لا يوجد</td></tr>'}
