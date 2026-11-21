@@ -249,7 +249,8 @@ $("fp").onclick=function(){var e=toEmail($("em").value);$("ae").style.color="";i
 $("out").onclick=function(){auth.signOut()};
 (function(){var l=document.createElement("link");l.rel="icon";l.href=$("lg").src;document.head.appendChild(l)})();
 
-auth.onAuthStateChanged(function(u){
+var AUTHCB=function(u){
+  try{if(u&&u.uid&&u.getIdToken)localStorage.setItem("ou",JSON.stringify({uid:u.uid,email:u.email}));else if(!u)localStorage.removeItem("ou")}catch(e){}
   document.body.classList.remove("isemp","gated");MODE="";TD=null;EF=0;PM={};EV={};DVS={};UL=0;MS={};MD={};MC={};LV=[];MQ=null;unsubs.forEach(function(f){f()});unsubs=[];me=u;U={};ST={};AT=[];ADV=[];BON=[];REQ=[];ADMS=[];PERM=null;BR={};WK=[];wgRole=null;AN=[];RD={};RA=[];HOL={};AN1={};AN2={};CL={};PS={};PEN=[];
   $("auth").classList.toggle("hide",!!u);$("app").classList.toggle("hide",!u);
   if(!u)return;
@@ -268,7 +269,8 @@ auth.onAuthStateChanged(function(u){
   function g1(p){if(g1.d)return;g1.d=1;go(p)}setTimeout(function(){g1(own?{owner:1,pay:1,edit:1,att:1,fin:1}:null)},6000);
   if(own)db.collection("admins").doc((u.email||"").toLowerCase()).get().then(function(d){g1(Object.assign({owner:1,pay:1,edit:1,att:1,fin:1},d.exists&&d.data().emp?{emp:1}:{}))}).catch(function(){g1({owner:1,pay:1,edit:1,att:1,fin:1})});
   else db.collection("admins").doc((u.email||"").toLowerCase()).get().then(function(d){g1(d.exists?d.data():null)}).catch(function(){g1(null)})
-});
+};auth.onAuthStateChanged(AUTHCB);
+setTimeout(function(){if(me||navigator.onLine)return;var c;try{c=JSON.parse(localStorage.getItem("ou"))}catch(e){}if(c&&c.uid)AUTHCB({uid:c.uid,email:c.email})},3500);
 
 /* ===== أدوات الحوافز والموقع ===== */
 var HP=[["h15","1.5"],["h225","2.25"],["h3","3"],["h4","4"],["h5","5"]],ROLES={tech:"فني",sales:"مندوب مبيعات",other:"موظف عادي",acc_mgr:"مدير الحسابات",accountant:"محاسب",cashier:"أمين خزنة",store:"أمين مخازن",store_asst:"مساعد أمين مخزن",supervisor:"مشرف عام",sales_mgr:"مدير مبيعات",tech_asst:"مساعد فني",driver:"سائق"},TL={inst:"تركيب",maint:"صيانة",sale:"بيع"};
