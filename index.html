@@ -220,7 +220,7 @@ function sumA(L,id,m){return L.filter(function(x){return x.uid===id}).reduce(fun
 if(FB_CONFIG.apiKey==="PUT_HERE"){document.body.innerHTML='<div class="w"><div class="c">لسه ماحطيتش إعدادات Firebase في أول الملف. اتبع خطوات الإعداد.</div></div>'}
 else{
 firebase.initializeApp(FB_CONFIG);
-var auth=firebase.auth(),db=firebase.firestore();db.enablePersistence().catch(function(e){console.warn("offline cache:",e.code)});
+var auth=firebase.auth(),db=firebase.firestore();var IOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(!IOS)db.enablePersistence().catch(function(e){console.warn("offline cache:",e.code)});
 var SUP=false,me=null,isAdmin=false,unsubs=[],U={},ST={},AT=[],ADV=[],BON=[],REQ=[],ADMS=[],PERM=null,signup=false,BR={},WK=[],wgRole=null,AU=[];
 
 var PH_DOM="@phone.local";
@@ -265,8 +265,9 @@ auth.onAuthStateChanged(function(u){
     }else{startEmp();buildEmp()}
   }
   $("sw2").onclick=function(){MODE=MODE==="emp"?"":"emp";rs();go(PADM)};
-  if(own)db.collection("admins").doc((u.email||"").toLowerCase()).get().then(function(d){go(Object.assign({owner:1,pay:1,edit:1,att:1,fin:1},d.exists&&d.data().emp?{emp:1}:{}))}).catch(function(){go({owner:1,pay:1,edit:1,att:1,fin:1})});
-  else db.collection("admins").doc((u.email||"").toLowerCase()).get().then(function(d){go(d.exists?d.data():null)}).catch(function(){go(null)})
+  function g1(p){if(g1.d)return;g1.d=1;go(p)}setTimeout(function(){g1(own?{owner:1,pay:1,edit:1,att:1,fin:1}:null)},6000);
+  if(own)db.collection("admins").doc((u.email||"").toLowerCase()).get().then(function(d){g1(Object.assign({owner:1,pay:1,edit:1,att:1,fin:1},d.exists&&d.data().emp?{emp:1}:{}))}).catch(function(){g1({owner:1,pay:1,edit:1,att:1,fin:1})});
+  else db.collection("admins").doc((u.email||"").toLowerCase()).get().then(function(d){g1(d.exists?d.data():null)}).catch(function(){g1(null)})
 });
 
 /* ===== أدوات الحوافز والموقع ===== */
