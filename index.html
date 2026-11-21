@@ -1071,7 +1071,7 @@ function offAct(k){var C=ocGet(),q=oqGet(),d=today();if(!C||!C.b)return alert("�
 document.addEventListener("click",function(ev){var t=ev.target.closest&&ev.target.closest("#ci,#co");if(!t||isAdmin||!me||navigator.onLine)return;ev.stopImmediatePropagation();ev.preventDefault();offAct(t.id==="ci"?"in":"out")},true);
 function oqFlush(){if(!me||isAdmin||!navigator.onLine||oqFlush.b||!oqGet().length)return;oqFlush.b=1;var id=me.uid,F=firebase.firestore.FieldValue;
  (function nx(){var q=oqGet();if(!q.length){oqFlush.b=0;oqUI();return}var x=q[0],ref=db.collection("att").doc(id+"_"+x.d),p;
-  if(x.k==="in"){var o={dv:x.dv,uid:id,name:(U[id]||{}).name||me.email,d:x.d,i:x.t,o:"",ts:F.serverTimestamp(),off:true,cts:x.ms};if(x.g)o.g=x.g;p=ref.get().then(function(s){return s.exists?0:ref.set(o)})}
+  if(x.k==="in"){var o={dv:x.dv,uid:id,name:(U[id]||{}).name||me.email,d:x.d,i:x.t,o:"",ts:F.serverTimestamp(),off:true,cts:x.ms};if(x.g)o.g=x.g;p=ref.set(o).catch(function(e){if(e&&e.code==="permission-denied")return ref.get().then(function(s){if(!s.exists)throw e});throw e})}
   else{var u={o:x.t,ots:F.serverTimestamp(),octs:x.ms,off:true};if(x.g)u.go=x.g;p=ref.update(u)}
   p.then(function(){var r=oqGet();r.shift();oqSet(r);oqUI();nx()}).catch(function(e){if(e&&(e.code==="permission-denied"||e.code==="not-found")){var r=oqGet();r.shift();oqSet(r);oqUI();alert("تعذر إرسال تسجيل "+(x.k==="in"?"حضور":"انصراف")+" يوم "+x.d+" (الشهر مقفول أو السجل مش موجود). كلم الإدارة.");nx()}else oqFlush.b=0})})()}
 addEventListener("online",function(){setTimeout(oqFlush,1500)});setInterval(function(){oqFlush();if(me&&!isAdmin)oqUI()},30000);
