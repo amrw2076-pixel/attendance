@@ -270,7 +270,7 @@ var AUTHCB=function(u){
   if(own)db.collection("admins").doc((u.email||"").toLowerCase()).get().then(function(d){g1(Object.assign({owner:1,pay:1,edit:1,att:1,fin:1},d.exists&&d.data().emp?{emp:1}:{}))}).catch(function(){g1({owner:1,pay:1,edit:1,att:1,fin:1})});
   else db.collection("admins").doc((u.email||"").toLowerCase()).get().then(function(d){g1(d.exists?d.data():null)}).catch(function(){g1(null)})
 };auth.onAuthStateChanged(AUTHCB);
-setTimeout(function(){if(me||navigator.onLine)return;var c;try{c=JSON.parse(localStorage.getItem("ou"))}catch(e){}if(c&&c.uid)AUTHCB({uid:c.uid,email:c.email})},3500);
+setTimeout(function(){if(me||navigator.onLine)return;var c;try{c=JSON.parse(localStorage.getItem("ou"))}catch(e){}if(c&&c.uid)AUTHCB({uid:c.uid,email:c.email});else alert("لازم تفتح التطبيق وإنت أونلاين وتسجّل دخول مرة واحدة الأول")},3500);
 
 /* ===== أدوات الحوافز والموقع ===== */
 var HP=[["h15","1.5"],["h225","2.25"],["h3","3"],["h4","4"],["h5","5"]],ROLES={tech:"فني",sales:"مندوب مبيعات",other:"موظف عادي",acc_mgr:"مدير الحسابات",accountant:"محاسب",cashier:"أمين خزنة",store:"أمين مخازن",store_asst:"مساعد أمين مخزن",supervisor:"مشرف عام",sales_mgr:"مدير مبيعات",tech_asst:"مساعد فني",driver:"سائق"},TL={inst:"تركيب",maint:"صيانة",sale:"بيع"};
@@ -1055,13 +1055,14 @@ function oqSet(a){try{localStorage.setItem(oqK(),JSON.stringify(a))}catch(e){}}
 function ocGet(){try{return JSON.parse(localStorage.getItem(ocK()))}catch(e){return null}}
 function ocSave(){if(!me||isAdmin)return;try{var id=me.uid,b=(ST[id]||{}).branch;if(!b||(b!=="free"&&!BR[b]))return;var m=today().slice(0,7),ds=AT.filter(function(a){return a.d.slice(0,7)===m&&((a.g&&a.g.fld)||(a.go&&a.go.fld))}),t=(TD||AT.filter(function(a){return a.d===today()})[0]),s=stg(id);
  localStorage.setItem(ocK(),JSON.stringify({b:b,br:b==="free"?null:BR[b],fld:!!s.fld,fmx:s.fmx||0,fd:ds.length,fl:ds.some(function(a){return a.d===today()}),td:t?{d:today(),i:t.i,o:t.o}:null,at:Date.now()}))}catch(e){}}
-var _dM5=drawMe;drawMe=function(){_dM5();try{ocSave();oqFlush();oqUI()}catch(e){}};
+var _dM5=drawMe;drawMe=function(){try{oqTD()}catch(e){}_dM5();try{ocSave();oqFlush();oqUI()}catch(e){}};
+function oqTD(){if(navigator.onLine||!me||isAdmin)return;var C=ocGet()||{},d=today(),b=C.td&&C.td.d===d?{i:C.td.i,o:C.td.o||""}:null;oqGet().forEach(function(x){if(x.d!==d)return;if(x.k==="in")b={i:x.t,o:""};else if(b)b.o=x.t});if(b)TD={uid:me.uid,d:d,i:b.i,o:b.o,name:(U[me.uid]||{}).name||me.email}}
 function oqUI(){var n=me&&!isAdmin?oqGet().length:0,d=$("oqn");if(!d){d=document.createElement("div");d.id="oqn";d.style.cssText="position:fixed;bottom:84px;right:12px;left:12px;background:#92400e;color:#fff;padding:8px 12px;border-radius:10px;font-size:13px;z-index:60;text-align:center;display:none";document.body.appendChild(d)}
  d.style.display=n?"block":"none";d.textContent="📴 فيه "+n+" تسجيل محفوظ على جهازك، هيتبعت أول ما النت يرجع"}
 function offAct(k){var C=ocGet(),q=oqGet(),d=today();if(!C||!C.b)return alert("لازم تفتح التطبيق وإنت أونلاين مرة واحدة على الأقل قبل ما تسجل أوفلاين");
  var hasIn=q.some(function(x){return x.k==="in"&&x.d===d})||!!(C.td&&C.td.d===d&&C.td.i),hasOut=q.some(function(x){return x.k==="out"&&x.d===d})||!!(C.td&&C.td.d===d&&C.td.o);
  if(k==="in"&&hasIn)return alert("حضورك متسجل النهارده");if(k==="out"&&!hasIn)return alert("سجّل حضور الأول");if(k==="out"&&hasOut)return alert("انصرافك متسجل النهارده");
- function fin(g){var r=oqGet();r.push({k:k,d:d,t:nowT(),ms:Date.now(),g:g||null,dv:DV()});oqSet(r);oqUI();toast("📴 اتسجل على جهازك وهيتبعت لما النت يرجع")}
+ function fin(g){var r=oqGet();r.push({k:k,d:d,t:nowT(),ms:Date.now(),g:g||null,dv:DV()});oqSet(r);oqUI();toast("📴 اتسجل على جهازك وهيتبعت لما النت يرجع");oqTD();drawMe()}
  if(C.b==="free")return fin(null);
  if(!navigator.geolocation||!C.br)return alert("تعذر تحديد الموقع أو بيانات الفرع مش محفوظة، افتح التطبيق أونلاين مرة");
  navigator.geolocation.getCurrentPosition(function(p){var br=C.br,dd=Math.round(dist(p.coords.latitude,p.coords.longitude,br.lat,br.lng)),g={lat:+p.coords.latitude.toFixed(6),lng:+p.coords.longitude.toFixed(6),acc:Math.round(p.coords.accuracy),dist:dd,br:br.name};
