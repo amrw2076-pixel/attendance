@@ -583,7 +583,7 @@ $("ba").onclick=function(){var n=$("bnm").value.trim(),c=$("bc").value.split(/[\
 var AN=[],RD={},RA=[],HOL={},AN1={},AN2={},NO=function(){};
 function fmt(t){return t&&t.toDate?t.toDate().toLocaleString("ar-EG",{timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"short"}):""}
 function cp(t){var o={};new Intl.DateTimeFormat("en-GB",{timeZone:"Africa/Cairo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(t).forEach(function(p){o[p.type]=p.value});return o}
-function normA(x){if(x.ts&&x.ts.toDate){var p=cp(x.ts.toDate());x.d=p.year+"-"+p.month+"-"+p.day;x.i=p.hour+":"+p.minute}if(x.ots&&x.ots.toDate){var q=cp(x.ots.toDate());x.o=q.hour+":"+q.minute}return x}
+function normA(x){if(x.ts&&x.ts.toDate){var p=cp(typeof x.cts==="number"?new Date(x.cts):x.ts.toDate());x.d=p.year+"-"+p.month+"-"+p.day;x.i=p.hour+":"+p.minute}if(x.ots&&x.ots.toDate){var q=cp(typeof x.octs==="number"?new Date(x.octs):x.ots.toDate());x.o=q.hour+":"+q.minute}return x}
 var ES=[["e1","الحضور والانصراف"],["e2","مرتبي وسجلي"],["e4","الشغل"],["e5","الطلبات"],["e6","الإشعارات"],["e7","الدردشة"]],AS=["a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12","a13"];
 function H(i,h){var n=$(i);if(n)n.classList.toggle("hide",h)}
 function allS(){return AS.concat(ES.map(function(e){return e[0]}))}
@@ -1045,6 +1045,34 @@ function rpRows(){var m=$("rp_m").value||today().slice(0,7);mload(m);return ids(
 $("rp_x").onclick=function(){xlsx([RPH].concat(rpRows()),"report-"+$("rp_m").value+".xlsx")};
 $("rp_x").insertAdjacentHTML("afterend",' <button class="b s" id="rp_c2">CSV</button>');
 $("rp_c2").onclick=function(){var csv="\ufeff"+[RPH].concat(rpRows()).map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(",")}).join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="report-"+$("rp_m").value+".csv";a.click()};
+
+/* ===== v15: تسجيل حضور وانصراف أوفلاين (بيتحفظ على الجهاز ويتبعت لما النت يرجع) ===== */
+function oqK(){return"oq_"+(me&&me.uid)}function ocK(){return"oc_"+(me&&me.uid)}
+function oqGet(){try{return JSON.parse(localStorage.getItem(oqK())||"[]")}catch(e){return[]}}
+function oqSet(a){try{localStorage.setItem(oqK(),JSON.stringify(a))}catch(e){}}
+function ocGet(){try{return JSON.parse(localStorage.getItem(ocK()))}catch(e){return null}}
+function ocSave(){if(!me||isAdmin)return;try{var id=me.uid,b=(ST[id]||{}).branch;if(!b||(b!=="free"&&!BR[b]))return;var m=today().slice(0,7),ds=AT.filter(function(a){return a.d.slice(0,7)===m&&((a.g&&a.g.fld)||(a.go&&a.go.fld))}),t=(TD||AT.filter(function(a){return a.d===today()})[0]),s=stg(id);
+ localStorage.setItem(ocK(),JSON.stringify({b:b,br:b==="free"?null:BR[b],fld:!!s.fld,fmx:s.fmx||0,fd:ds.length,fl:ds.some(function(a){return a.d===today()}),td:t?{d:today(),i:t.i,o:t.o}:null,at:Date.now()}))}catch(e){}}
+var _dM5=drawMe;drawMe=function(){_dM5();try{ocSave();oqFlush();oqUI()}catch(e){}};
+function oqUI(){var n=me&&!isAdmin?oqGet().length:0,d=$("oqn");if(!d){d=document.createElement("div");d.id="oqn";d.style.cssText="position:fixed;bottom:84px;right:12px;left:12px;background:#92400e;color:#fff;padding:8px 12px;border-radius:10px;font-size:13px;z-index:60;text-align:center;display:none";document.body.appendChild(d)}
+ d.style.display=n?"block":"none";d.textContent="📴 فيه "+n+" تسجيل محفوظ على جهازك، هيتبعت أول ما النت يرجع"}
+function offAct(k){var C=ocGet(),q=oqGet(),d=today();if(!C||!C.b)return alert("لازم تفتح التطبيق وإنت أونلاين مرة واحدة على الأقل قبل ما تسجل أوفلاين");
+ var hasIn=q.some(function(x){return x.k==="in"&&x.d===d})||!!(C.td&&C.td.d===d&&C.td.i),hasOut=q.some(function(x){return x.k==="out"&&x.d===d})||!!(C.td&&C.td.d===d&&C.td.o);
+ if(k==="in"&&hasIn)return alert("حضورك متسجل النهارده");if(k==="out"&&!hasIn)return alert("سجّل حضور الأول");if(k==="out"&&hasOut)return alert("انصرافك متسجل النهارده");
+ function fin(g){var r=oqGet();r.push({k:k,d:d,t:nowT(),ms:Date.now(),g:g||null,dv:DV()});oqSet(r);oqUI();toast("📴 اتسجل على جهازك وهيتبعت لما النت يرجع")}
+ if(C.b==="free")return fin(null);
+ if(!navigator.geolocation||!C.br)return alert("تعذر تحديد الموقع أو بيانات الفرع مش محفوظة، افتح التطبيق أونلاين مرة");
+ navigator.geolocation.getCurrentPosition(function(p){var br=C.br,dd=Math.round(dist(p.coords.latitude,p.coords.longitude,br.lat,br.lng)),g={lat:+p.coords.latitude.toFixed(6),lng:+p.coords.longitude.toFixed(6),acc:Math.round(p.coords.accuracy),dist:dd,br:br.name};
+  if(dd>br.r){if(!C.fld)return alert("إنت برا نطاق "+br.name+": بعيد "+dd+" متر والمسموح "+br.r+" متر");if(C.fmx>0&&!C.fl&&C.fd>=C.fmx)return alert("وصلت الحد الأقصى للتسجيل من خارج المقر في الشهر، كلم الإدارة");
+   if(!confirm("إنت برا نطاق "+br.name+" (بعيد "+dd+" متر).\nتسجّل من خارج المقر؟"))return;var n=(prompt("اكتب مكان الشغل أو اسم العميل (إجباري):","")||"").trim();if(!n)return alert("لازم تكتب مكان الشغل عشان يتسجل");g.fld=true;g.fn=n.slice(0,80)}
+  fin(g)},function(e){alert("تعذر تحديد الموقع: "+geoErr(e))},{enableHighAccuracy:true,timeout:20000,maximumAge:0})}
+document.addEventListener("click",function(ev){var t=ev.target.closest&&ev.target.closest("#ci,#co");if(!t||isAdmin||!me||navigator.onLine)return;ev.stopImmediatePropagation();ev.preventDefault();offAct(t.id==="ci"?"in":"out")},true);
+function oqFlush(){if(!me||isAdmin||!navigator.onLine||oqFlush.b||!oqGet().length)return;oqFlush.b=1;var id=me.uid,F=firebase.firestore.FieldValue;
+ (function nx(){var q=oqGet();if(!q.length){oqFlush.b=0;oqUI();return}var x=q[0],ref=db.collection("att").doc(id+"_"+x.d),p;
+  if(x.k==="in"){var o={dv:x.dv,uid:id,name:(U[id]||{}).name||me.email,d:x.d,i:x.t,o:"",ts:F.serverTimestamp(),off:true,cts:x.ms};if(x.g)o.g=x.g;p=ref.get().then(function(s){return s.exists?0:ref.set(o)})}
+  else{var u={o:x.t,ots:F.serverTimestamp(),octs:x.ms,off:true};if(x.g)u.go=x.g;p=ref.update(u)}
+  p.then(function(){var r=oqGet();r.shift();oqSet(r);oqUI();nx()}).catch(function(e){if(e&&(e.code==="permission-denied"||e.code==="not-found")){var r=oqGet();r.shift();oqSet(r);oqUI();alert("تعذر إرسال تسجيل "+(x.k==="in"?"حضور":"انصراف")+" يوم "+x.d+" (الشهر مقفول أو السجل مش موجود). كلم الإدارة.");nx()}else oqFlush.b=0})})()}
+addEventListener("online",function(){setTimeout(oqFlush,1500)});setInterval(function(){oqFlush();if(me&&!isAdmin)oqUI()},30000);
 
 }
 </script>
