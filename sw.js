@@ -1,10 +1,6 @@
-// عامل خدمة بسيط: بيخلي الموقع يتثبت كتطبيق ويفتح أسرع، ومابيخزنش بيانات Firebase أبداً
-var C="mf-v1";
-self.addEventListener("install",function(e){self.skipWaiting()});
+var C="att-v15",SHELL=["./","index.html","manifest.webmanifest","icon-192.png","https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js","https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js","https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"];
+self.addEventListener("install",function(e){e.waitUntil(caches.open(C).then(function(c){return Promise.all(SHELL.map(function(u){var x=u.indexOf("http")===0;return fetch(new Request(u,x?{mode:"no-cors"}:{})).then(function(r){return c.put(u,r)}).catch(function(){})}))}).then(function(){return self.skipWaiting()}))});
 self.addEventListener("activate",function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.filter(function(x){return x!==C}).map(function(x){return caches.delete(x)}))}).then(function(){return self.clients.claim()}))});
-self.addEventListener("fetch",function(e){
-  var r=e.request,u=new URL(r.url);
-  if(r.method!=="GET"||u.origin!==location.origin)return;
-  e.respondWith(fetch(r).then(function(res){var cp=res.clone();caches.open(C).then(function(c){c.put(r,cp)});return res}).catch(function(){return caches.match(r)}))});
-self.addEventListener("notificationclick",function(e){e.notification.close();
-  e.waitUntil(self.clients.matchAll({type:"window"}).then(function(l){return l.length?l[0].focus():self.clients.openWindow("./")}))});
+self.addEventListener("fetch",function(e){var r=e.request,u=new URL(r.url);if(r.method!=="GET")return;
+ if(u.hostname.indexOf("firestore.googleapis.com")>=0||u.hostname.indexOf("identitytoolkit")>=0||u.hostname.indexOf("securetoken")>=0||u.hostname.indexOf("tile.openstreetmap")>=0)return;
+ e.respondWith(fetch(r).then(function(res){var k=res.clone();caches.open(C).then(function(c){c.put(r,k)});return res}).catch(function(){return caches.match(r,{ignoreSearch:true}).then(function(m){return m||(r.mode==="navigate"?caches.match("index.html"):Response.error())})}))});
